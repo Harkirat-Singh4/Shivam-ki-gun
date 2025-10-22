@@ -1,27 +1,41 @@
 # 🎯 AI Sniper Detection System
 
-A professional web-based interface for real-time sniper detection using a trained YOLO11 model.
+A professional web-based interface for real-time sniper detection using a trained YOLO11 model with **live camera monitoring** and **video processing** capabilities.
 
 ## 🚀 Features
 
-### Core Detection
-- **Real-time Image Analysis**: Upload images for instant sniper detection
+### 🎥 **Live Camera Detection** (NEW!)
+- **Real-time Camera Access**: Live video feed with instant AI detection
+- **Multi-Camera Support**: Choose from available cameras (0, 1, 2...)
+- **30 FPS Processing**: Smooth real-time detection at ~30 frames per second
+- **Live Threat Monitoring**: Instant alerts for high-confidence detections
+
+### 🎬 **Video Processing** (NEW!)
+- **Video File Upload**: Drag & drop video files for comprehensive analysis
+- **Timeline Detection**: Frame-by-frame analysis with timestamps
+- **Batch Processing**: Efficient processing of long video files
+- **Multiple Formats**: Support for MP4, AVI, MOV, WMV, MKV and more
+
+### 📷 **Image Analysis** (Enhanced)
+- **Instant Image Detection**: Upload images for immediate sniper detection
 - **High-Performance YOLO11**: Uses your trained model (`my_model.pt`) for accurate detection
 - **Confidence Scoring**: Visual confidence indicators for each detection
 - **Bounding Box Visualization**: Clear visual markers on detected threats
 
-### Professional Interface
-- **Modern Dashboard**: Clean, military-grade dark theme interface
-- **Real-time Statistics**: Live tracking of detection metrics
+### 🎛️ **Professional Interface**
+- **Tabbed Multi-Mode Interface**: Switch between Image, Camera, and Video modes
+- **Military-Grade Design**: Clean, dark theme with red accent colors
+- **Real-time Statistics**: Live tracking of detection metrics across all modes
 - **Threat Level Indicators**: Visual threat assessment (LOW/MEDIUM/HIGH)
-- **Activity Feed**: Real-time log of all system activities
+- **Live Activity Feed**: Real-time log of all system activities
 
-### Advanced Features
+### ⚡ **Advanced Features**
 - **WebSocket Integration**: Real-time updates without page refresh
-- **Drag & Drop Upload**: Intuitive image upload interface
+- **Drag & Drop Upload**: Intuitive file upload for images and videos
 - **Alert System**: Immediate notifications for high-confidence detections
 - **Statistics Tracking**: Comprehensive detection analytics
 - **Responsive Design**: Works on desktop, tablet, and mobile devices
+- **Camera Controls**: Start/stop camera with device selection
 
 ## 📊 Model Performance
 

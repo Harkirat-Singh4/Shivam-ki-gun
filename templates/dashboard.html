@@ -79,31 +79,135 @@
 
             <!-- Detection Interface -->
             <div class="detection-section">
-                <div class="upload-area">
-                    <div class="upload-zone" id="uploadZone">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                        <h3>Upload Image for Analysis</h3>
-                        <p>Drag and drop an image here, or click to select</p>
-                        <input type="file" id="fileInput" accept="image/*" hidden>
-                        <button class="btn-primary" onclick="document.getElementById('fileInput').click()">
-                            <i class="fas fa-upload"></i> Select Image
-                        </button>
+                <!-- Detection Mode Tabs -->
+                <div class="detection-tabs">
+                    <button class="tab-btn active" onclick="switchTab('image')">
+                        <i class="fas fa-image"></i> Image Upload
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('camera')">
+                        <i class="fas fa-video"></i> Live Camera
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('video')">
+                        <i class="fas fa-film"></i> Video Upload
+                    </button>
+                </div>
+
+                <!-- Image Upload Tab -->
+                <div class="tab-content active" id="imageTab">
+                    <div class="upload-area">
+                        <div class="upload-zone" id="uploadZone">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <h3>Upload Image for Analysis</h3>
+                            <p>Drag and drop an image here, or click to select</p>
+                            <input type="file" id="fileInput" accept="image/*" hidden>
+                            <button class="btn-primary" onclick="document.getElementById('fileInput').click()">
+                                <i class="fas fa-upload"></i> Select Image
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="results-area">
+                        <div class="image-display" id="imageDisplay">
+                            <div class="placeholder">
+                                <i class="fas fa-image"></i>
+                                <p>No image loaded</p>
+                            </div>
+                        </div>
+                        
+                        <div class="detection-info" id="detectionInfo">
+                            <h3>Detection Results</h3>
+                            <div class="no-results">
+                                <i class="fas fa-search"></i>
+                                <p>Upload an image to see detection results</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="results-area">
-                    <div class="image-display" id="imageDisplay">
-                        <div class="placeholder">
-                            <i class="fas fa-image"></i>
-                            <p>No image loaded</p>
+                <!-- Camera Tab -->
+                <div class="tab-content" id="cameraTab">
+                    <div class="camera-controls">
+                        <div class="camera-header">
+                            <h3><i class="fas fa-video"></i> Live Camera Detection</h3>
+                            <div class="camera-status" id="cameraStatus">
+                                <span class="status-dot"></span>
+                                <span>Camera Off</span>
+                            </div>
+                        </div>
+                        
+                        <div class="camera-buttons">
+                            <button class="btn-primary" id="startCameraBtn" onclick="startCamera()">
+                                <i class="fas fa-play"></i> Start Camera
+                            </button>
+                            <button class="btn-secondary" id="stopCameraBtn" onclick="stopCamera()" disabled>
+                                <i class="fas fa-stop"></i> Stop Camera
+                            </button>
+                            <select id="cameraSelect" class="camera-select">
+                                <option value="0">Camera 0 (Default)</option>
+                                <option value="1">Camera 1</option>
+                                <option value="2">Camera 2</option>
+                            </select>
                         </div>
                     </div>
-                    
-                    <div class="detection-info" id="detectionInfo">
-                        <h3>Detection Results</h3>
-                        <div class="no-results">
-                            <i class="fas fa-search"></i>
-                            <p>Upload an image to see detection results</p>
+
+                    <div class="camera-display">
+                        <div class="camera-feed" id="cameraFeed">
+                            <div class="placeholder">
+                                <i class="fas fa-video-slash"></i>
+                                <p>Camera not active</p>
+                                <small>Click "Start Camera" to begin live detection</small>
+                            </div>
+                        </div>
+                        
+                        <div class="live-detection-info" id="liveDetectionInfo">
+                            <h3>Live Detection Feed</h3>
+                            <div class="detection-stats">
+                                <div class="stat-item">
+                                    <span class="stat-label">Current Frame:</span>
+                                    <span class="stat-value" id="currentFrame">-</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Live Detections:</span>
+                                    <span class="stat-value" id="liveDetections">0</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">FPS:</span>
+                                    <span class="stat-value" id="cameraFPS">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Video Upload Tab -->
+                <div class="tab-content" id="videoTab">
+                    <div class="upload-area">
+                        <div class="upload-zone" id="videoUploadZone">
+                            <i class="fas fa-film"></i>
+                            <h3>Upload Video for Analysis</h3>
+                            <p>Drag and drop a video file here, or click to select</p>
+                            <input type="file" id="videoInput" accept="video/*" hidden>
+                            <button class="btn-primary" onclick="document.getElementById('videoInput').click()">
+                                <i class="fas fa-upload"></i> Select Video
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="video-results">
+                        <div class="video-info" id="videoInfo">
+                            <h3>Video Analysis</h3>
+                            <div class="no-results">
+                                <i class="fas fa-film"></i>
+                                <p>Upload a video to see analysis results</p>
+                            </div>
+                        </div>
+                        
+                        <div class="video-detections" id="videoDetections">
+                            <h3>Detection Timeline</h3>
+                            <div class="timeline-placeholder">
+                                <i class="fas fa-clock"></i>
+                                <p>Video timeline will appear here</p>
+                            </div>
                         </div>
                     </div>
                 </div>
