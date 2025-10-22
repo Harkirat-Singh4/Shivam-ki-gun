@@ -26,6 +26,10 @@
       browserAlerts: false,
       recordEvents: true,
       apiEndpoint: '',
+      apiToken: '',
+      requestFormat: 'multipart', // 'multipart' | 'json_base64'
+      liveFps: 2,
+      sendZones: false,
     }),
     events: loadJson('sniper.events', []),
   };
@@ -135,6 +139,7 @@
   let liveCtx, liveCanvas, videoEl, zoneCanvas, zoneCtx;
   let videoStream = null;
   let detectionTimer = null;
+  let inferTimer = null;
   let currentZones = [];
 
   function renderLive() {}
@@ -158,8 +163,11 @@
     $('#videoFileInput').addEventListener('change', onVideoFile);
 
     const apiInput = $('#apiEndpoint');
+    const apiTokInput = $('#apiToken');
     apiInput.value = state.settings.apiEndpoint || '';
+    apiTokInput.value = state.settings.apiToken || '';
     apiInput.addEventListener('change', () => { state.settings.apiEndpoint = apiInput.value; persistSettings(); });
+    apiTokInput.addEventListener('change', () => { state.settings.apiToken = apiTokInput.value; persistSettings(); });
 
     const demoToggle = $('#demoModeToggle');
     if (demoToggle) {
@@ -170,6 +178,9 @@
     $('#resetConnectionBtn').addEventListener('click', () => {
       setStatus(false, 'Disconnected'); clearInterval(detectionTimer); detectionTimer = null; toast('Connection reset');
     });
+
+    $('#startInferBtn').addEventListener('click', startLiveInference);
+    $('#stopInferBtn').addEventListener('click', stopLiveInference);
 
     // Zone Editing
     const zoneEditToggle = $('#zoneEditToggle');
@@ -258,6 +269,7 @@
 
   function startDemoDetections() {
     clearInterval(detectionTimer);
+    clearInterval(inferTimer);
     if (!state.demoMode) return; // only when demo enabled
     const list = $('#detectionsList');
     detectionTimer = setInterval(() => {
@@ -284,6 +296,80 @@
         if (state.settings.browserAlerts) notifyBrowser('Sniper detected', `${Math.round(score*100)}% confidence`);
       }
     }, 1500);
+  }
+
+  async function startLiveInference() {
+    if (!state.settings.apiEndpoint) { toast('Set API endpoint in Settings/Live'); return; }
+    clearInterval(inferTimer); clearInterval(detectionTimer);
+    const btnStart = $('#startInferBtn'); const btnStop = $('#stopInferBtn');
+    btnStart.disabled = true; btnStop.disabled = false;
+    const intervalMs = Math.max(100, Math.floor(1000 / (state.settings.liveFps || 2)));
+    setStatus(true, 'Connecting…');
+    inferTimer = setInterval(async () => {
+      try {
+        const frameBlob = await captureCurrentFrame(videoEl, liveCanvas.width, liveCanvas.height);
+        if (!frameBlob) return;
+        const detections = await callInference(frameBlob);
+        drawDetections(detections);
+        if (detections && detections.length) {
+          const best = detections[0];
+          if (state.settings.recordEvents && best.score >= state.settings.threshold) {
+            const snap = snapshotWithOverlay();
+            addDetectionEvent(snap, best);
+            if (state.settings.soundAlerts) playBeep();
+            if (state.settings.browserAlerts) notifyBrowser('Sniper detected', `${Math.round(best.score*100)}% confidence`);
+          }
+        }
+        setStatus(true, 'Connected');
+      } catch (e) {
+        setStatus(false, 'Error');
+      }
+    }, intervalMs);
+  }
+
+  function stopLiveInference() {
+    clearInterval(inferTimer); inferTimer = null;
+    $('#startInferBtn').disabled = false; $('#stopInferBtn').disabled = true;
+    setStatus(state.demoMode, state.demoMode ? 'Demo Connected' : 'Disconnected');
+  }
+
+  async function captureCurrentFrame(video, w, h) {
+    if (!video) return null;
+    const c = document.createElement('canvas'); c.width = w; c.height = h; const cx = c.getContext('2d');
+    try { cx.drawImage(video, 0, 0, w, h); } catch { return null; }
+    const blob = await new Promise(res => c.toBlob(res, 'image/jpeg', 0.8));
+    return blob;
+  }
+
+  async function callInference(frameBlob) {
+    const endpoint = state.settings.apiEndpoint;
+    const token = state.settings.apiToken;
+    const fmt = state.settings.requestFormat || 'multipart';
+    const headers = {};
+    if (token) headers['Authorization'] = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+    let body; let contentType;
+    if (fmt === 'json_base64') {
+      const b64 = await blobToBase64(frameBlob);
+      headers['Content-Type'] = 'application/json';
+      body = JSON.stringify({ image: b64, zones: state.settings.sendZones ? state.zones : undefined, threshold: state.settings.threshold, iou: state.settings.iou });
+    } else {
+      const form = new FormData();
+      form.append('image', frameBlob, 'frame.jpg');
+      if (state.settings.sendZones) form.append('zones', JSON.stringify(state.zones));
+      form.append('threshold', String(state.settings.threshold));
+      form.append('iou', String(state.settings.iou));
+      body = form; // browser sets content-type
+    }
+    const res = await fetch(endpoint, { method: 'POST', headers, body });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    // Expect format: [{ label, score, bbox: [x,y,w,h] }]
+    const dets = Array.isArray(data) ? data : (data.detections || []);
+    return dets.map(n => ({ label: n.label || 'sniper', score: Number(n.score || 0), bbox: n.bbox }));
+  }
+
+  function blobToBase64(blob) {
+    return new Promise((resolve) => { const r = new FileReader(); r.onloadend = () => resolve(r.result); r.readAsDataURL(blob); });
   }
 
   function playBeep() {
@@ -393,10 +479,19 @@
       return boxes;
     }
 
-    function run() {
+    async function run() {
       const stage = img.classList.contains('hidden') ? vid : img;
       const rect = stage.getBoundingClientRect();
-      const dets = fakeDetections(rect.width, rect.height).filter(d => d.score >= (parseFloat(threshInput.value) || state.settings.threshold));
+      let dets = [];
+      if (state.demoMode || !state.settings.apiEndpoint) {
+        dets = fakeDetections(rect.width, rect.height).filter(d => d.score >= (parseFloat(threshInput.value) || state.settings.threshold));
+      } else {
+        // capture frame from stage to blob
+        const c = document.createElement('canvas'); c.width = rect.width; c.height = rect.height; const cx = c.getContext('2d');
+        try { cx.drawImage(stage, 0, 0, c.width, c.height); } catch {}
+        const blob = await new Promise(res => c.toBlob(res, 'image/jpeg', 0.9));
+        try { dets = await callInference(blob); } catch (e) { toast('Analyze error', e.message || String(e)); }
+      }
       draw(dets);
       // Save thumbnail result
       const c2 = document.createElement('canvas'); c2.width = canvas.width; c2.height = canvas.height; const c2x = c2.getContext('2d');
@@ -455,6 +550,18 @@
   // --- Settings ---
   function renderSettings() {}
   function attachSettings() {
+    const apiE = $('#settingsApiEndpoint'); const apiT = $('#apiTokenSettings'); const reqF = $('#requestFormat'); const fps = $('#liveFps'); const sendZ = $('#sendZones');
+    if (apiE) apiE.value = state.settings.apiEndpoint || '';
+    if (apiT) apiT.value = state.settings.apiToken || '';
+    if (reqF) reqF.value = state.settings.requestFormat || 'multipart';
+    if (fps) fps.value = state.settings.liveFps || 2;
+    if (sendZ) sendZ.checked = !!state.settings.sendZones;
+
+    apiE?.addEventListener('change', () => { state.settings.apiEndpoint = apiE.value; persistSettings(); });
+    apiT?.addEventListener('change', () => { state.settings.apiToken = apiT.value; persistSettings(); });
+    reqF?.addEventListener('change', () => { state.settings.requestFormat = reqF.value; persistSettings(); });
+    fps?.addEventListener('change', () => { state.settings.liveFps = Math.max(0.5, Math.min(15, parseFloat(fps.value)||2)); persistSettings(); });
+    sendZ?.addEventListener('change', () => { state.settings.sendZones = sendZ.checked; persistSettings(); });
     const th = $('#threshold'); const thOut = $('#thresholdOut'); th.value = state.settings.threshold; thOut.textContent = formatPct(state.settings.threshold);
     const iou = $('#iou'); const iouOut = $('#iouOut'); iou.value = state.settings.iou; iouOut.textContent = formatPct(state.settings.iou);
     const sound = $('#soundAlerts'); const browserN = $('#browserAlerts'); const record = $('#recordEvents');

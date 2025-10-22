@@ -73,6 +73,17 @@ body {
 
 .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
 .control-group { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.control-group label { color: var(--muted); font-size: 12px; }
+.control-group input[type="url"],
+.control-group input[type="password"],
+.form input[type="url"],
+.form input[type="password"],
+.form input[type="number"],
+.form select {
+  width: 100%;
+  background: #0c1422; color: var(--text); border: 1px solid var(--border);
+  padding: 8px 10px; border-radius: 8px;
+}
 
 .list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .list li { padding: 8px 10px; background: #0c1422; border: 1px solid var(--border); border-radius: 8px; display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; }
