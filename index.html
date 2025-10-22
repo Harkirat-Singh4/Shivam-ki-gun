@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sniper Detection System — Interface</title>
+  <meta name="description" content="Interface for AI Sniper Detection System" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Cg fill='none' stroke='%23fff' stroke-width='10'%3E%3Ccircle cx='64' cy='64' r='54'/%3E%3Cpath d='M64 10v28M64 90v28M10 64h28M90 64h28'/%3E%3C/g%3E%3Ccircle cx='64' cy='64' r='8' fill='%23ff4d4f'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div id="app" class="app">
+    <aside class="sidebar" aria-label="Primary">
+      <div class="brand">
+        <span class="brand-dot"></span>
+        <span class="brand-name">AI Sniper</span>
+      </div>
+      <nav class="nav">
+        <a href="#dashboard" data-route="dashboard" class="nav-item is-active" aria-label="Dashboard">
+          <span class="icon">📊</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="#live" data-route="live" class="nav-item" aria-label="Live Monitor">
+          <span class="icon">🎥</span>
+          <span>Live Monitor</span>
+        </a>
+        <a href="#analyze" data-route="analyze" class="nav-item" aria-label="Analyze Media">
+          <span class="icon">🧪</span>
+          <span>Analyze</span>
+        </a>
+        <a href="#events" data-route="events" class="nav-item" aria-label="Events">
+          <span class="icon">📂</span>
+          <span>Events</span>
+        </a>
+        <a href="#settings" data-route="settings" class="nav-item" aria-label="Settings">
+          <span class="icon">⚙️</span>
+          <span>Settings</span>
+        </a>
+        <a href="#help" data-route="help" class="nav-item" aria-label="Help">
+          <span class="icon">❓</span>
+          <span>Help</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <button id="demoToggle" class="btn btn-ghost" title="Toggle Demo Mode">🧪 Demo</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="breadcrumbs">
+          <span id="routeTitle">Dashboard</span>
+        </div>
+        <div class="spacer"></div>
+        <div class="status">
+          <span class="status-dot" id="statusDot" aria-hidden="true"></span>
+          <span id="statusText" class="status-text">Disconnected</span>
+        </div>
+      </header>
+
+      <section id="view" class="view" role="region" aria-live="polite"></section>
+    </main>
+  </div>
+
+  <!-- View Templates -->
+  <template id="tpl-dashboard">
+    <div class="grid grid-2">
+      <section class="card">
+        <header class="card-header">
+          <h2>Model Metrics</h2>
+          <div class="card-actions">
+            <button class="btn btn-ghost btn-sm" data-action="reload-metrics">↻ Refresh</button>
+          </div>
+        </header>
+        <div class="card-content metrics">
+          <div class="metrics-row">
+            <figure>
+              <img src="./confusion_matrix.png" alt="Confusion Matrix" />
+              <figcaption>Confusion Matrix</figcaption>
+            </figure>
+            <figure>
+              <img src="./confusion_matrix_normalized.png" alt="Normalized Confusion Matrix" />
+              <figcaption>Confusion Matrix (Normalized)</figcaption>
+            </figure>
+          </div>
+          <div class="metrics-row">
+            <figure>
+              <img src="./BoxP_curve.png" alt="Precision Curve" />
+              <figcaption>Precision Curve</figcaption>
+            </figure>
+            <figure>
+              <img src="./BoxR_curve.png" alt="Recall Curve" />
+              <figcaption>Recall Curve</figcaption>
+            </figure>
+            <figure>
+              <img src="./BoxPR_curve.png" alt="PR Curve" />
+              <figcaption>PR Curve</figcaption>
+            </figure>
+            <figure>
+              <img src="./BoxF1_curve.png" alt="F1 Curve" />
+              <figcaption>F1 Curve</figcaption>
+            </figure>
+          </div>
+          <div class="metrics-row">
+            <figure class="wide">
+              <img src="./results.png" alt="Training Results" />
+              <figcaption>Training Results</figcaption>
+            </figure>
+          </div>
+          <div id="metricsTableWrap" class="metrics-table-wrap"></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <header class="card-header">
+          <h2>Quick Actions</h2>
+        </header>
+        <div class="card-content">
+          <div class="actions">
+            <button class="btn" data-nav="#live">Open Live Monitor</button>
+            <button class="btn" data-nav="#analyze">Analyze Image/Video</button>
+            <button class="btn btn-ghost" data-nav="#events">View Events</button>
+          </div>
+          <div class="hint">Tip: Toggle Demo Mode to simulate detections without a backend.</div>
+        </div>
+      </section>
+    </div>
+  </template>
+
+  <template id="tpl-live">
+    <div class="grid grid-2">
+      <section class="card stretch">
+        <header class="card-header">
+          <h2>Live Monitor</h2>
+          <div class="card-actions">
+            <label class="switch" title="Draw/Edit Zones">
+              <input type="checkbox" id="zoneEditToggle" />
+              <span>Zone Edit</span>
+            </label>
+            <button class="btn btn-ghost btn-sm" id="clearZonesBtn">Clear Zones</button>
+          </div>
+        </header>
+        <div class="card-content live">
+          <div class="stage">
+            <video id="liveVideo" playsinline muted></video>
+            <canvas id="liveCanvas" class="overlay"></canvas>
+            <canvas id="zoneCanvas" class="overlay" aria-hidden="true"></canvas>
+          </div>
+          <div class="controls">
+            <div class="control-group">
+              <button class="btn" id="startCamBtn">Start Camera</button>
+              <button class="btn btn-ghost" id="stopCamBtn" disabled>Stop</button>
+              <label class="file">
+                <input type="file" id="videoFileInput" accept="video/*" />
+                <span>Open Video</span>
+              </label>
+            </div>
+            <div class="control-group">
+              <label>API Endpoint</label>
+              <input id="apiEndpoint" type="url" placeholder="https://api.example.com/infer" />
+              <label>API Token</label>
+              <input id="apiToken" type="password" placeholder="optional" />
+              <label class="switch">
+                <input type="checkbox" id="demoModeToggle" />
+                <span>Demo Mode</span>
+              </label>
+              <button class="btn" id="startInferBtn">Start Inference</button>
+              <button class="btn btn-ghost" id="stopInferBtn" disabled>Stop Inference</button>
+              <button class="btn btn-ghost" id="resetConnectionBtn">Reset</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <header class="card-header">
+          <h2>Detections</h2>
+        </header>
+        <div class="card-content">
+          <ul id="detectionsList" class="list"></ul>
+        </div>
+      </section>
+    </div>
+  </template>
+
+  <template id="tpl-analyze">
+    <div class="grid grid-2">
+      <section class="card stretch">
+        <header class="card-header">
+          <h2>Analyze Media</h2>
+          <div class="card-actions">
+            <button class="btn btn-ghost btn-sm" id="exportAnnotatedBtn" disabled>Export Annotated</button>
+          </div>
+        </header>
+        <div class="card-content analyze">
+          <div class="stage">
+            <img id="analyzeImage" alt=""/>
+            <video id="analyzeVideo" controls class="hidden" playsinline></video>
+            <canvas id="analyzeCanvas" class="overlay"></canvas>
+          </div>
+          <div class="controls">
+            <label class="file">
+              <input id="analyzeFile" type="file" accept="image/*,video/*" />
+              <span>Choose Image/Video</span>
+            </label>
+            <label>Threshold <input id="analyzeThreshold" type="range" min="0" max="1" step="0.01" /></label>
+            <button class="btn" id="runAnalyzeBtn" disabled>Run</button>
+          </div>
+        </div>
+      </section>
+      <section class="card">
+        <header class="card-header"><h2>Recent Results</h2></header>
+        <div class="card-content">
+          <ul id="analyzeResults" class="list"></ul>
+        </div>
+      </section>
+    </div>
+  </template>
+
+  <template id="tpl-events">
+    <section class="card">
+      <header class="card-header">
+        <h2>Events</h2>
+        <div class="card-actions">
+          <input id="eventFilter" type="search" placeholder="Filter…" />
+          <button class="btn btn-ghost btn-sm" id="clearEventsBtn">Clear</button>
+        </div>
+      </header>
+      <div class="card-content">
+        <div id="eventsGrid" class="events-grid"></div>
+      </div>
+    </section>
+  </template>
+
+  <template id="tpl-settings">
+    <section class="card">
+      <header class="card-header">
+        <h2>Settings</h2>
+      </header>
+      <div class="card-content form">
+        <div class="form-row">
+          <label for="settingsApiEndpoint">API Endpoint</label>
+          <input id="settingsApiEndpoint" type="url" placeholder="https://api.example.com/infer" />
+        </div>
+        <div class="form-row">
+          <label for="apiTokenSettings">API Token (optional)</label>
+          <input id="apiTokenSettings" type="password" placeholder="Bearer/Key token" />
+        </div>
+        <div class="form-row">
+          <label for="requestFormat">Request Format</label>
+          <select id="requestFormat">
+            <option value="multipart">multipart/form-data (image)</option>
+            <option value="json_base64">application/json (base64 image)</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label for="liveFps">Live Inference FPS</label>
+          <input id="liveFps" type="number" step="0.5" min="0.5" max="15" />
+        </div>
+        <div class="form-row">
+          <label class="switch">
+            <input id="sendZones" type="checkbox" />
+            <span>Send Zones to backend</span>
+          </label>
+        </div>
+        <div class="form-row">
+          <label for="threshold">Detection Threshold</label>
+          <input id="threshold" type="range" min="0" max="1" step="0.01" />
+          <output id="thresholdOut"></output>
+        </div>
+        <div class="form-row">
+          <label for="iou">NMS IoU</label>
+          <input id="iou" type="range" min="0" max="1" step="0.01" />
+          <output id="iouOut"></output>
+        </div>
+        <div class="form-row">
+          <label class="switch">
+            <input id="soundAlerts" type="checkbox" />
+            <span>Sound Alerts</span>
+          </label>
+          <label class="switch">
+            <input id="browserAlerts" type="checkbox" />
+            <span>Browser Notifications</span>
+          </label>
+          <label class="switch">
+            <input id="recordEvents" type="checkbox" />
+            <span>Record Snapshots</span>
+          </label>
+        </div>
+      </div>
+    </section>
+  </template>
+
+  <template id="tpl-help">
+    <section class="card">
+      <header class="card-header"><h2>Help</h2></header>
+      <div class="card-content">
+        <ol class="help-steps">
+          <li>Open Live Monitor and click Start Camera (or open a video).</li>
+          <li>Toggle Demo Mode to simulate detections without a backend.</li>
+          <li>Use Zone Edit to draw areas of interest (saved locally).</li>
+          <li>Manage sensitivity in Settings; alerts trigger when a sniper is detected.</li>
+          <li>View past detections in Events; export annotated frames from Analyze.</li>
+        </ol>
+        <p class="hint">For best results, run via a local server (e.g., <code>python -m http.server</code>) so camera access works.</p>
+      </div>
+    </section>
+  </template>
+
+  <div id="toast" class="toast" role="status" aria-live="assertive" aria-atomic="true"></div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
