@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Sniper Detection System - Tactical Interface</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <div class="logo">
+                    <div class="logo-icon">⚠</div>
+                    <div class="logo-text">
+                        <h1>AI SNIPER DETECTION</h1>
+                        <span class="subtitle">Tactical Defense System</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-center">
+                <div class="status-indicator">
+                    <div class="pulse-dot" id="statusDot"></div>
+                    <span id="systemStatus">SYSTEM OPERATIONAL</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="datetime">
+                    <div id="currentTime">--:--:--</div>
+                    <div id="currentDate">----/--/--</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Grid -->
+        <div class="main-grid">
+            <!-- Left Panel - Statistics -->
+            <aside class="left-panel">
+                <div class="panel-section">
+                    <h3 class="panel-title">THREAT LEVEL</h3>
+                    <div class="threat-meter">
+                        <div class="threat-indicator" id="threatIndicator">
+                            <div class="threat-level-text" id="threatLevel">LOW</div>
+                        </div>
+                        <div class="threat-bar">
+                            <div class="threat-bar-fill" id="threatBar"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3 class="panel-title">DETECTION STATISTICS</h3>
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <div class="stat-label">Active Threats</div>
+                            <div class="stat-value critical" id="activeThreats">0</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Total Detections</div>
+                            <div class="stat-value" id="totalDetections">0</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Avg Confidence</div>
+                            <div class="stat-value" id="avgConfidence">0%</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Last Detection</div>
+                            <div class="stat-value small" id="lastDetection">--:--:--</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3 class="panel-title">SYSTEM INFO</h3>
+                    <div class="system-info">
+                        <div class="info-row">
+                            <span class="info-label">Model Status:</span>
+                            <span class="info-value" id="modelStatus">LOADING...</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Device:</span>
+                            <span class="info-value" id="deviceInfo">--</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Processing:</span>
+                            <span class="info-value" id="processingStatus">STANDBY</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3 class="panel-title">ALERTS</h3>
+                    <div class="alert-panel" id="alertPanel">
+                        <div class="alert-item info">
+                            <span class="alert-time">--:--:--</span>
+                            <span class="alert-message">System initialized</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Center - Video Feed -->
+            <main class="video-panel">
+                <div class="video-header">
+                    <div class="video-title">
+                        <span class="recording-dot"></span>
+                        LIVE SURVEILLANCE FEED
+                    </div>
+                    <div class="video-controls">
+                        <button class="control-btn" id="fullscreenBtn" title="Fullscreen">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+                            </svg>
+                        </button>
+                        <button class="control-btn" id="snapshotBtn" title="Take Snapshot">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"/>
+                                <path d="M3 9a2 2 0 0 1 2-2h1.93a2 2 0 0 0 1.66-.9l.82-1.2a2 2 0 0 1 1.66-.9h2.86a2 2 0 0 1 1.66.9l.82 1.2a2 2 0 0 0 1.66.9H19a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="video-container" id="videoContainer">
+                    <img src="{{ url_for('video_feed') }}" id="videoFeed" alt="Video Feed">
+                    <div class="video-overlay">
+                        <div class="crosshair">
+                            <div class="crosshair-h"></div>
+                            <div class="crosshair-v"></div>
+                        </div>
+                        <div class="corner-brackets">
+                            <div class="bracket tl"></div>
+                            <div class="bracket tr"></div>
+                            <div class="bracket bl"></div>
+                            <div class="bracket br"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="video-footer">
+                    <div class="coord-info">
+                        <span>COORD: <span id="coordinates">00.0000°N, 00.0000°E</span></span>
+                        <span class="separator">|</span>
+                        <span>ZOOM: <span id="zoomLevel">1.0x</span></span>
+                        <span class="separator">|</span>
+                        <span>FPS: <span id="fpsCounter">30</span></span>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Right Panel - Detection Log -->
+            <aside class="right-panel">
+                <div class="panel-section">
+                    <h3 class="panel-title">DETECTION LOG</h3>
+                    <div class="detection-log" id="detectionLog">
+                        <div class="log-item">
+                            <div class="log-time">--:--:--</div>
+                            <div class="log-message">Awaiting detections...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3 class="panel-title">CONFIDENCE METER</h3>
+                    <div class="confidence-display">
+                        <div class="confidence-bar-container">
+                            <div class="confidence-bar-bg">
+                                <div class="confidence-bar-fill" id="confidenceBar"></div>
+                            </div>
+                            <div class="confidence-labels">
+                                <span>0%</span>
+                                <span>50%</span>
+                                <span>100%</span>
+                            </div>
+                        </div>
+                        <div class="confidence-value-display">
+                            <span class="confidence-label">Current:</span>
+                            <span class="confidence-value" id="currentConfidence">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3 class="panel-title">QUICK ACTIONS</h3>
+                    <div class="action-buttons">
+                        <button class="action-btn primary" id="soundAlarmBtn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+                                <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+                            </svg>
+                            Sound Alarm
+                        </button>
+                        <button class="action-btn" id="clearAlertsBtn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 6h18"/>
+                                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                            </svg>
+                            Clear Alerts
+                        </button>
+                        <button class="action-btn" id="exportReportBtn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Export Report
+                        </button>
+                        <button class="action-btn danger" id="emergencyBtn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="12" y1="8" x2="12" y2="12"/>
+                                <line x1="12" y1="16" x2="12.01" y2="16"/>
+                            </svg>
+                            Emergency Protocol
+                        </button>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3 class="panel-title">DETECTION HISTORY</h3>
+                    <canvas id="historyChart" width="300" height="150"></canvas>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- Alert Modal -->
+    <div class="modal" id="alertModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>⚠ THREAT DETECTED</h2>
+            </div>
+            <div class="modal-body">
+                <p>Sniper detected in surveillance zone!</p>
+                <p>Confidence: <span id="modalConfidence">--</span></p>
+                <p>Time: <span id="modalTime">--</span></p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn" id="acknowledgeBtn">Acknowledge</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
