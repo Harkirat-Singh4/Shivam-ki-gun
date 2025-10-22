@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI Sniper Detection System</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <h1>AI Sniper Detection System</h1>
+      <div class="status" id="status">Loading model…</div>
+    </header>
+
+    <main class="container">
+      <section class="left">
+        <div class="video-card">
+          <video id="camera" autoplay playsinline muted></video>
+          <canvas id="overlay"></canvas>
+          <div class="controls">
+            <button id="toggleCam">Enable Camera</button>
+            <label class="file-btn">
+              <input type="file" id="file" accept="image/*" hidden />
+              <span>Upload Image</span>
+            </label>
+            <button id="detectBtn">Detect</button>
+          </div>
+        </div>
+
+        <div class="sliders">
+          <label>Confidence: <span id="confVal">0.25</span>
+            <input type="range" id="conf" min="0" max="1" step="0.01" value="0.25" />
+          </label>
+          <label>IoU: <span id="iouVal">0.45</span>
+            <input type="range" id="iou" min="0" max="1" step="0.01" value="0.45" />
+          </label>
+        </div>
+
+        <div class="hint">Drag on the video to set ROI</div>
+      </section>
+
+      <section class="right">
+        <div class="alerts" id="alerts"></div>
+        <div class="events">
+          <h2>Event Log</h2>
+          <ul id="log"></ul>
+        </div>
+      </section>
+    </main>
+
+    <script src="/script.js"></script>
+  </body>
+</html>
