@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Sniper Detection System - Demo</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .demo-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+        
+        .demo-content {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            border-radius: 12px;
+            border: 1px solid #00ff88;
+            padding: 2rem;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+        
+        .demo-content h2 {
+            font-family: 'JetBrains Mono', monospace;
+            color: #00ff88;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .demo-content p {
+            color: #cccccc;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        
+        .demo-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        
+        .demo-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+        
+        .demo-btn.primary {
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            color: white;
+        }
+        
+        .demo-btn.secondary {
+            background: #333;
+            color: #cccccc;
+            border: 1px solid #555;
+        }
+        
+        .demo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
+        }
+        
+        .demo-features {
+            text-align: left;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: rgba(0, 255, 136, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+        }
+        
+        .demo-features h3 {
+            color: #00ff88;
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+        }
+        
+        .demo-features ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .demo-features li {
+            color: #cccccc;
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .demo-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #00ff88;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-overlay">
+        <div class="demo-content">
+            <h2>🎯 AI SNIPER DETECTION SYSTEM</h2>
+            <p>Welcome to the advanced AI-powered sniper detection interface. This system uses YOLO11s model trained for 100 epochs with 68.69% mAP@50 accuracy.</p>
+            
+            <div class="demo-features">
+                <h3>Key Features:</h3>
+                <ul>
+                    <li>Real-time camera feed detection</li>
+                    <li>Image and video upload support</li>
+                    <li>Live bounding box visualization</li>
+                    <li>High-confidence alert system</li>
+                    <li>Adjustable detection parameters</li>
+                    <li>Export detection results</li>
+                    <li>Modern YOLO-style interface</li>
+                </ul>
+            </div>
+            
+            <div class="demo-buttons">
+                <button class="demo-btn primary" onclick="startDemo()">
+                    <i class="fas fa-play"></i> Start Demo
+                </button>
+                <button class="demo-btn secondary" onclick="viewCode()">
+                    <i class="fas fa-code"></i> View Code
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function startDemo() {
+            document.querySelector('.demo-overlay').style.display = 'none';
+            // Initialize the main application
+            if (typeof SniperDetectionSystem !== 'undefined') {
+                window.sniperDetectionSystem = new SniperDetectionSystem();
+            }
+        }
+        
+        function viewCode() {
+            window.open('https://github.com/your-repo/ai-sniper-detection', '_blank');
+        }
+        
+        // Auto-hide demo after 10 seconds
+        setTimeout(() => {
+            if (document.querySelector('.demo-overlay').style.display !== 'none') {
+                startDemo();
+            }
+        }, 10000);
+    </script>
+    
+    <!-- Include the main application -->
+    <script src="script.js"></script>
+</body>
+</html>
