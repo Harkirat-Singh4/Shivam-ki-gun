@@ -172,7 +172,7 @@ class SniperDetectionHandler(http.server.SimpleHTTPRequestHandler):
 
 def main():
     """Start the server"""
-    PORT = 8000
+    PORT = 8080
     
     # Create uploads directory if it doesn't exist
     os.makedirs('uploads', exist_ok=True)
