@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """
 AI Sniper Detection System Server Startup Script
 """
@@ -22,7 +22,7 @@ def check_requirements():
     except ImportError as e:
         print(f"✗ Missing required package: {e}")
         print("Installing requirements...")
-        subprocess.check_call(["python3", "-m", "pip", "install", "-r", "requirements.txt"])
+        subprocess.check_call(["python", "-m", "pip", "install", "-r", "requirements.txt"])
         return True
 
 def check_model():
@@ -64,7 +64,7 @@ def main():
     
     try:
         # Start the FastAPI server
-        os.system("python3 app.py")
+        os.system("python app.py")
     except KeyboardInterrupt:
         print("\n\n👋 Server stopped by user")
     except Exception as e:
