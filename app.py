@@ -1,7 +1,16 @@
-from fastapi import FastAPI, File, UploadFile, WebSocket, WebSocketDisconnect, Request
-from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
+try:
+    from fastapi import FastAPI, File, UploadFile, WebSocket, WebSocketDisconnect, Request
+    from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
+    from fastapi.staticfiles import StaticFiles
+    from fastapi.templating import Jinja2Templates
+except ImportError as e:
+    raise ImportError(
+        "Missing required package 'fastapi' or one of its submodules. "
+        "Install required dependencies with:\n\n"
+        "    pip install fastapi uvicorn jinja2 python-multipart\n\n"
+        "If you're using an environment manager, ensure the interpreter for your editor/IDE "
+        "is set to the environment where these packages are installed."
+    ) from e
 import cv2
 import numpy as np
 import torch
