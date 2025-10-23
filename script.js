@@ -35,6 +35,20 @@ class SniperDetectionSystem {
         this.processingTime = document.getElementById('processingTime');
         this.detectionList = document.getElementById('detectionList');
         
+        // Terminal elements
+        this.terminalConsole = document.getElementById('terminalConsole');
+        this.consoleOutput = document.getElementById('consoleOutput');
+        this.terminalTabs = document.querySelectorAll('.terminal-tab');
+        this.clearConsoleBtn = document.getElementById('clearConsole');
+        this.exportLogsBtn = document.getElementById('exportLogs');
+        this.fullscreenTerminalBtn = document.getElementById('fullscreenTerminal');
+        
+        // Terminal results
+        this.terminalResultsList = document.getElementById('terminalResultsList');
+        this.terminalAlertsList = document.getElementById('terminalAlertsList');
+        this.terminalHistoryList = document.getElementById('terminalHistoryList');
+        this.clearHistoryBtn = document.getElementById('clearHistory');
+        
         // Control elements
         this.tabBtns = document.querySelectorAll('.tab-btn');
         this.cameraControls = document.getElementById('cameraControls');
@@ -141,11 +155,25 @@ class SniperDetectionSystem {
         this.cancelSettings.addEventListener('click', () => this.closeSettingsModal());
         this.saveSettings.addEventListener('click', () => this.saveSettings());
 
+        // Terminal controls
+        this.clearConsoleBtn.addEventListener('click', () => this.clearConsole());
+        this.exportLogsBtn.addEventListener('click', () => this.exportLogs());
+        this.fullscreenTerminalBtn.addEventListener('click', () => this.toggleFullscreenTerminal());
+        this.clearHistoryBtn.addEventListener('click', () => this.clearHistory());
+        
+        // Terminal tabs
+        this.terminalTabs.forEach(tab => {
+            tab.addEventListener('click', (e) => this.switchTerminalTab(e.currentTarget.dataset.tab));
+        });
+
         // Alert notification
         this.closeAlert.addEventListener('click', () => this.hideAlert());
 
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => this.handleKeyboard(e));
+        
+        // Initialize terminal
+        this.initializeTerminal();
     }
 
     loadModelPerformance() {
@@ -188,6 +216,9 @@ class SniperDetectionSystem {
 
     async startCamera() {
         try {
+            this.addConsoleLine('[INFO]', 'Requesting camera access...', 'info');
+            this.addCommandHistory('start_camera()', 'success');
+            
             this.cameraStream = await navigator.mediaDevices.getUserMedia({
                 video: { 
                     width: { ideal: 1280 },
@@ -212,9 +243,13 @@ class SniperDetectionSystem {
             // Start continuous detection
             this.startContinuousDetection();
             
+            this.addConsoleLine('[SUCCESS]', 'Camera started successfully - Live feed active', 'success');
+            this.addTerminalResult('[CAMERA]', 'Live camera feed started');
             this.showNotification('Camera started successfully');
         } catch (error) {
             console.error('Camera access denied:', error);
+            this.addConsoleLine('[ERROR]', `Camera access denied: ${error.message}`, 'error');
+            this.addCommandHistory('start_camera()', 'error');
             this.showError('Camera access denied. Please allow camera permissions.');
         }
     }
@@ -361,13 +396,18 @@ class SniperDetectionSystem {
         this.detectBtn.innerHTML = '<div class="loading"></div> PROCESSING...';
         this.detectBtn.disabled = true;
 
+        this.addConsoleLine('[INFO]', 'Starting detection process...', 'info');
+        this.addCommandHistory('start_detection()', 'success');
+
         const startTime = performance.now();
 
         try {
             let results;
             if (this.currentInputType === 'camera' && this.isCameraActive) {
+                this.addConsoleLine('[INFO]', 'Processing live camera feed...', 'info');
                 results = await this.detectInLiveFeed();
             } else {
+                this.addConsoleLine('[INFO]', 'Processing uploaded media...', 'info');
                 results = await this.simulateDetection();
             }
             
@@ -378,14 +418,22 @@ class SniperDetectionSystem {
             this.updateDetectionInfo(results.length, processingTime);
             this.addToHistory(results, processingTime);
             
+            // Log detection results
+            this.addConsoleLine('[SUCCESS]', `Detection completed: ${results.length} objects found in ${processingTime}ms`, 'success');
+            this.addTerminalResult('[DETECTION]', `${results.length} sniper(s) detected with ${processingTime}ms processing time`);
+            
             // Check for high-confidence sniper detections
             const highConfidenceDetections = results.filter(r => r.confidence > 0.8);
             if (highConfidenceDetections.length > 0) {
+                this.addConsoleLine('[WARNING]', `HIGH CONFIDENCE DETECTION: ${highConfidenceDetections.length} sniper(s) detected!`, 'warning');
+                this.addTerminalAlert('[WARNING]', `${highConfidenceDetections.length} high-confidence sniper detection(s)`);
                 this.showAlert(highConfidenceDetections.length);
             }
 
         } catch (error) {
             console.error('Detection failed:', error);
+            this.addConsoleLine('[ERROR]', `Detection failed: ${error.message}`, 'error');
+            this.addCommandHistory('start_detection()', 'error');
             this.showError('Detection failed. Please try again.');
         } finally {
             this.isDetecting = false;
@@ -710,6 +758,8 @@ class SniperDetectionSystem {
     }
 
     showNotification(message) {
+        this.addConsoleLine('[SUCCESS]', message, 'success');
+        
         // Create notification element
         const notification = document.createElement('div');
         notification.className = 'notification fade-in';
@@ -736,7 +786,140 @@ class SniperDetectionSystem {
         }, 3000);
     }
 
+    // Terminal functionality
+    initializeTerminal() {
+        this.consoleHistory = [];
+        this.commandHistory = [];
+        this.currentCommandIndex = -1;
+        this.addConsoleLine('[INFO]', 'Terminal initialized successfully', 'info');
+        this.addConsoleLine('[INFO]', 'Type commands or use the interface controls', 'info');
+    }
+
+    addConsoleLine(type, message, level = 'info') {
+        const timestamp = new Date().toLocaleTimeString();
+        const line = document.createElement('div');
+        line.className = 'console-line';
+        
+        const prompt = document.createElement('span');
+        prompt.className = 'console-prompt';
+        prompt.textContent = type;
+        
+        const text = document.createElement('span');
+        text.className = 'console-text';
+        text.textContent = message;
+        
+        const time = document.createElement('span');
+        time.className = 'console-time';
+        time.textContent = timestamp;
+        
+        line.appendChild(prompt);
+        line.appendChild(text);
+        line.appendChild(time);
+        
+        this.consoleOutput.appendChild(line);
+        this.consoleOutput.scrollTop = this.consoleOutput.scrollHeight;
+        
+        // Store in history
+        this.consoleHistory.push({ type, message, timestamp, level });
+    }
+
+    addTerminalResult(type, message) {
+        const timestamp = new Date().toLocaleTimeString();
+        const item = document.createElement('div');
+        item.className = 'terminal-result-item';
+        
+        item.innerHTML = `
+            <span class="result-timestamp">${timestamp}</span>
+            <span class="result-type">${type}</span>
+            <span class="result-text">${message}</span>
+        `;
+        
+        this.terminalResultsList.appendChild(item);
+        this.terminalResultsList.scrollTop = this.terminalResultsList.scrollHeight;
+    }
+
+    addTerminalAlert(type, message) {
+        const timestamp = new Date().toLocaleTimeString();
+        const item = document.createElement('div');
+        item.className = 'terminal-alert-item';
+        
+        item.innerHTML = `
+            <span class="alert-timestamp">${timestamp}</span>
+            <span class="alert-type">${type}</span>
+            <span class="alert-text">${message}</span>
+        `;
+        
+        this.terminalAlertsList.appendChild(item);
+        this.terminalAlertsList.scrollTop = this.terminalAlertsList.scrollHeight;
+        
+        // Update alert count
+        const alertCount = this.terminalAlertsList.children.length - 1; // Subtract the "no alerts" item
+        document.getElementById('alertCount').textContent = alertCount;
+    }
+
+    addCommandHistory(command, status = 'success') {
+        const timestamp = new Date().toLocaleTimeString();
+        const item = document.createElement('div');
+        item.className = 'terminal-history-item';
+        
+        item.innerHTML = `
+            <span class="history-timestamp">${timestamp}</span>
+            <span class="history-command">${command}</span>
+            <span class="history-status ${status}">${status.toUpperCase()}</span>
+        `;
+        
+        this.terminalHistoryList.insertBefore(item, this.terminalHistoryList.firstChild);
+        
+        // Keep only last 20 commands
+        while (this.terminalHistoryList.children.length > 20) {
+            this.terminalHistoryList.removeChild(this.terminalHistoryList.lastChild);
+        }
+    }
+
+    clearConsole() {
+        this.consoleOutput.innerHTML = '';
+        this.addConsoleLine('[USER@SNIPER-DETECTOR]', 'Console cleared', 'info');
+    }
+
+    clearHistory() {
+        this.terminalHistoryList.innerHTML = '';
+        this.addConsoleLine('[INFO]', 'Command history cleared', 'info');
+    }
+
+    exportLogs() {
+        const logs = this.consoleHistory.map(log => 
+            `[${log.timestamp}] ${log.type} ${log.message}`
+        ).join('\n');
+        
+        const blob = new Blob([logs], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `sniper_detection_logs_${Date.now()}.txt`;
+        a.click();
+        URL.revokeObjectURL(url);
+        
+        this.addConsoleLine('[INFO]', 'Logs exported successfully', 'info');
+    }
+
+    toggleFullscreenTerminal() {
+        this.terminalConsole.classList.toggle('fullscreen');
+        this.addConsoleLine('[INFO]', 'Terminal fullscreen toggled', 'info');
+    }
+
+    switchTerminalTab(tab) {
+        this.terminalTabs.forEach(t => t.classList.remove('active'));
+        document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+        
+        // Show/hide appropriate content
+        // This would control which panel is visible
+        this.addConsoleLine('[INFO]', `Switched to ${tab} tab`, 'info');
+    }
+
     showError(message) {
+        this.addConsoleLine('[ERROR]', message, 'error');
+        this.addTerminalAlert('[ERROR]', message);
+        
         // Create error notification
         const notification = document.createElement('div');
         notification.className = 'notification fade-in';

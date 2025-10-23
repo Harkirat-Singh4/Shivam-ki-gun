@@ -51,6 +51,77 @@
             </div>
         </nav>
 
+        <!-- Terminal Console Bar -->
+        <div class="terminal-bar">
+            <div class="terminal-tabs">
+                <div class="terminal-tab active" data-tab="console">
+                    <i class="fas fa-terminal"></i>
+                    <span>CONSOLE</span>
+                </div>
+                <div class="terminal-tab" data-tab="detection">
+                    <i class="fas fa-crosshairs"></i>
+                    <span>DETECTION</span>
+                </div>
+                <div class="terminal-tab" data-tab="metrics">
+                    <i class="fas fa-chart-line"></i>
+                    <span>METRICS</span>
+                </div>
+            </div>
+            <div class="terminal-controls">
+                <button class="terminal-btn" id="clearConsole" title="Clear Console">
+                    <i class="fas fa-trash"></i>
+                </button>
+                <button class="terminal-btn" id="exportLogs" title="Export Logs">
+                    <i class="fas fa-download"></i>
+                </button>
+                <button class="terminal-btn" id="fullscreenTerminal" title="Fullscreen">
+                    <i class="fas fa-expand"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Terminal Console -->
+        <div class="terminal-console" id="terminalConsole">
+            <div class="console-header">
+                <div class="console-title">
+                    <i class="fas fa-terminal"></i>
+                    <span>AI Sniper Detection System - YOLO11s</span>
+                </div>
+                <div class="console-status">
+                    <span class="status-indicator">
+                        <div class="status-dot active"></div>
+                        <span>MODEL LOADED</span>
+                    </span>
+                </div>
+            </div>
+            <div class="console-output" id="consoleOutput">
+                <div class="console-line">
+                    <span class="console-prompt">[INFO]</span>
+                    <span class="console-text">Initializing AI Sniper Detection System...</span>
+                    <span class="console-time">12:34:56</span>
+                </div>
+                <div class="console-line">
+                    <span class="console-prompt">[INFO]</span>
+                    <span class="console-text">Loading YOLO11s model: my_model.pt</span>
+                    <span class="console-time">12:34:57</span>
+                </div>
+                <div class="console-line">
+                    <span class="console-prompt">[SUCCESS]</span>
+                    <span class="console-text">Model loaded successfully - mAP@50: 68.69%</span>
+                    <span class="console-time">12:34:58</span>
+                </div>
+                <div class="console-line">
+                    <span class="console-prompt">[INFO]</span>
+                    <span class="console-text">Detection system ready. Press SPACE to start detection.</span>
+                    <span class="console-time">12:34:59</span>
+                </div>
+                <div class="console-line active">
+                    <span class="console-prompt">[USER@SNIPER-DETECTOR]</span>
+                    <span class="console-cursor">█</span>
+                </div>
+            </div>
+        </div>
+
         <!-- Main Content -->
         <main class="main-content">
             <!-- Left Control Panel -->
@@ -162,37 +233,45 @@
                         <i class="fas fa-chart-line"></i>
                         <h3>MODEL PERFORMANCE</h3>
                     </div>
-                    <div class="metrics-container">
-                        <div class="metric-row">
-                            <div class="metric-item">
-                                <div class="metric-label">mAP@50</div>
-                                <div class="metric-value" id="map50Value">68.69%</div>
-                                <div class="metric-bar">
-                                    <div class="metric-fill" style="width: 68.69%"></div>
-                                </div>
+                    <div class="yolo-metrics">
+                        <div class="yolo-metric">
+                            <div class="metric-header">
+                                <span class="metric-name">mAP@50</span>
+                                <span class="metric-value" id="map50Value">68.69%</span>
                             </div>
-                            <div class="metric-item">
-                                <div class="metric-label">mAP@50-95</div>
-                                <div class="metric-value" id="map50_95Value">57.32%</div>
-                                <div class="metric-bar">
-                                    <div class="metric-fill" style="width: 57.32%"></div>
-                                </div>
+                            <div class="yolo-progress-bar">
+                                <div class="progress-fill" style="width: 68.69%"></div>
+                                <div class="progress-text">68.69%</div>
                             </div>
                         </div>
-                        <div class="metric-row">
-                            <div class="metric-item">
-                                <div class="metric-label">PRECISION</div>
-                                <div class="metric-value" id="precisionValue">61.40%</div>
-                                <div class="metric-bar">
-                                    <div class="metric-fill" style="width: 61.40%"></div>
-                                </div>
+                        <div class="yolo-metric">
+                            <div class="metric-header">
+                                <span class="metric-name">mAP@50-95</span>
+                                <span class="metric-value" id="map50_95Value">57.32%</span>
                             </div>
-                            <div class="metric-item">
-                                <div class="metric-label">RECALL</div>
-                                <div class="metric-value" id="recallValue">61.40%</div>
-                                <div class="metric-bar">
-                                    <div class="metric-fill" style="width: 61.40%"></div>
-                                </div>
+                            <div class="yolo-progress-bar">
+                                <div class="progress-fill" style="width: 57.32%"></div>
+                                <div class="progress-text">57.32%</div>
+                            </div>
+                        </div>
+                        <div class="yolo-metric">
+                            <div class="metric-header">
+                                <span class="metric-name">Precision</span>
+                                <span class="metric-value" id="precisionValue">61.40%</span>
+                            </div>
+                            <div class="yolo-progress-bar">
+                                <div class="progress-fill" style="width: 61.40%"></div>
+                                <div class="progress-text">61.40%</div>
+                            </div>
+                        </div>
+                        <div class="yolo-metric">
+                            <div class="metric-header">
+                                <span class="metric-name">Recall</span>
+                                <span class="metric-value" id="recallValue">61.40%</span>
+                            </div>
+                            <div class="yolo-progress-bar">
+                                <div class="progress-fill" style="width: 61.40%"></div>
+                                <div class="progress-text">61.40%</div>
                             </div>
                         </div>
                     </div>
@@ -304,34 +383,65 @@
                 </div>
             </div>
 
-            <!-- Right Panel - Results & Alerts -->
+            <!-- Right Panel - Terminal Style Results -->
             <div class="right-panel">
-                <div class="results-section">
-                    <h3><i class="fas fa-list"></i> Detection Results</h3>
-                    <div class="results-list" id="resultsList">
-                        <div class="no-results">
-                            <i class="fas fa-search"></i>
-                            <p>No detections yet</p>
+                <div class="terminal-results">
+                    <div class="results-header">
+                        <div class="results-title">
+                            <i class="fas fa-terminal"></i>
+                            <span>DETECTION RESULTS</span>
+                        </div>
+                        <div class="results-stats">
+                            <span class="detection-count" id="detectionCount">0 DETECTIONS</span>
+                            <span class="processing-time" id="processingTime">0ms</span>
+                        </div>
+                    </div>
+                    <div class="terminal-results-list" id="terminalResultsList">
+                        <div class="terminal-result-item">
+                            <span class="result-timestamp">12:34:56</span>
+                            <span class="result-type">[INFO]</span>
+                            <span class="result-text">No detections found</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="alerts-section">
-                    <h3><i class="fas fa-exclamation-triangle"></i> Alerts</h3>
-                    <div class="alerts-list" id="alertsList">
-                        <div class="no-alerts">
-                            <i class="fas fa-shield-alt"></i>
-                            <p>No active alerts</p>
+                <div class="terminal-alerts">
+                    <div class="alerts-header">
+                        <div class="alerts-title">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>ALERT LOG</span>
+                        </div>
+                        <div class="alert-count" id="alertCount">0</div>
+                    </div>
+                    <div class="terminal-alerts-list" id="terminalAlertsList">
+                        <div class="terminal-alert-item">
+                            <span class="alert-timestamp">12:34:56</span>
+                            <span class="alert-type">[WARNING]</span>
+                            <span class="alert-text">No active alerts</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="history-section">
-                    <h3><i class="fas fa-history"></i> Detection History</h3>
-                    <div class="history-list" id="historyList">
-                        <div class="no-history">
-                            <i class="fas fa-clock"></i>
-                            <p>No detection history</p>
+                <div class="terminal-history">
+                    <div class="history-header">
+                        <div class="history-title">
+                            <i class="fas fa-history"></i>
+                            <span>COMMAND HISTORY</span>
+                        </div>
+                        <button class="clear-history-btn" id="clearHistory">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="terminal-history-list" id="terminalHistoryList">
+                        <div class="terminal-history-item">
+                            <span class="history-timestamp">12:34:56</span>
+                            <span class="history-command">start_detection()</span>
+                            <span class="history-status success">SUCCESS</span>
+                        </div>
+                        <div class="terminal-history-item">
+                            <span class="history-timestamp">12:34:55</span>
+                            <span class="history-command">load_model()</span>
+                            <span class="history-status success">SUCCESS</span>
                         </div>
                     </div>
                 </div>

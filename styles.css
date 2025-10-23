@@ -52,20 +52,179 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+    background: #0a0a0a;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+}
+
+/* Terminal Console Bar */
+.terminal-bar {
+    background: #1a1a1a;
+    border-bottom: 1px solid #333;
+    padding: 0.5rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.terminal-tabs {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.terminal-tab {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 4px;
+    color: #888;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.terminal-tab.active {
+    background: #00ff88;
+    color: #000;
+    border-color: #00ff88;
+}
+
+.terminal-tab:hover:not(.active) {
+    background: #333;
+    color: #fff;
+}
+
+.terminal-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.terminal-btn {
+    width: 32px;
+    height: 32px;
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 4px;
+    color: #888;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+}
+
+.terminal-btn:hover {
+    background: #333;
+    color: #fff;
+    border-color: #00ff88;
+}
+
+/* Terminal Console */
+.terminal-console {
+    background: #0a0a0a;
+    border-bottom: 1px solid #333;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.console-header {
+    background: #1a1a1a;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.console-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #00ff88;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.console-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.console-output {
+    padding: 1rem;
+    background: #0a0a0a;
+    color: #00ff88;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+}
+
+.console-line {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.25rem;
+    padding: 0.25rem 0;
+}
+
+.console-line.active {
+    background: rgba(0, 255, 136, 0.1);
+    padding: 0.5rem;
+    border-radius: 4px;
+}
+
+.console-prompt {
+    color: #00ff88;
+    font-weight: 600;
+    min-width: 120px;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+}
+
+.console-text {
+    color: #ffffff;
+    flex: 1;
+}
+
+.console-time {
+    color: #666;
+    font-size: 0.75rem;
+    min-width: 60px;
+    text-align: right;
+}
+
+.console-cursor {
+    color: #00ff88;
+    animation: blink 1s infinite;
+    font-weight: bold;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
 }
 
 /* Top Navigation */
 .top-nav {
-    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
-    border-bottom: 2px solid var(--primary-color);
+    background: #1a1a1a;
+    border-bottom: 1px solid #333;
     padding: 1rem 2rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     position: relative;
-    overflow: hidden;
 }
 
 .top-nav::before {
@@ -236,25 +395,26 @@ body {
 /* Main Content */
 .main-content {
     display: grid;
-    grid-template-columns: 350px 1fr 300px;
-    gap: 1.5rem;
-    padding: 2rem;
+    grid-template-columns: 350px 1fr 350px;
+    gap: 1rem;
+    padding: 1rem;
     flex: 1;
     max-width: 1600px;
     margin: 0 auto;
     width: 100%;
+    background: #0a0a0a;
 }
 
 /* Control Panel */
 .control-panel {
-    background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
-    border-radius: var(--border-radius-lg);
-    border: 1px solid var(--border-color);
-    box-shadow: var(--shadow-lg);
-    padding: 1.5rem;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 1rem;
     height: fit-content;
     position: sticky;
-    top: 2rem;
+    top: 1rem;
+    font-family: 'JetBrains Mono', monospace;
 }
 
 .panel-section {
@@ -689,6 +849,89 @@ body {
     transition: width 0.3s ease;
 }
 
+/* YOLO Metrics */
+.yolo-metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.yolo-metric {
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 6px;
+    padding: 1rem;
+    position: relative;
+}
+
+.metric-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.metric-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: #00ff88;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.metric-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #00ff88;
+}
+
+.yolo-progress-bar {
+    position: relative;
+    height: 20px;
+    background: #1a1a1a;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #333;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #00ff88, #00cc6a);
+    border-radius: 10px;
+    transition: width 0.3s ease;
+    position: relative;
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #000;
+    text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+}
+
 /* Action Buttons */
 .action-buttons {
     display: flex;
@@ -1109,19 +1352,161 @@ body {
     color: var(--text-muted);
 }
 
-/* Right Panel - Results & Alerts */
+/* Right Panel - Terminal Style Results */
 .right-panel {
-    background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
-    border-radius: var(--border-radius-lg);
-    border: 1px solid var(--border-color);
-    box-shadow: var(--shadow-lg);
-    padding: 1.5rem;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 1rem;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1rem;
     height: fit-content;
     position: sticky;
-    top: 2rem;
+    top: 1rem;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.terminal-results, .terminal-alerts, .terminal-history {
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.results-header, .alerts-header, .history-header {
+    background: #1a1a1a;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.results-title, .alerts-title, .history-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #00ff88;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.results-stats {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.75rem;
+}
+
+.detection-count {
+    color: #00ff88;
+    font-weight: 600;
+}
+
+.processing-time {
+    color: #666;
+}
+
+.alert-count {
+    background: #ff4444;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    min-width: 20px;
+    text-align: center;
+}
+
+.terminal-results-list, .terminal-alerts-list, .terminal-history-list {
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 0.5rem;
+}
+
+.terminal-result-item, .terminal-alert-item, .terminal-history-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    margin-bottom: 0.25rem;
+    background: #1a1a1a;
+    border-radius: 4px;
+    border-left: 3px solid #333;
+    font-size: 0.8rem;
+    line-height: 1.4;
+}
+
+.terminal-result-item:hover, .terminal-alert-item:hover, .terminal-history-item:hover {
+    background: #222;
+    border-left-color: #00ff88;
+}
+
+.result-timestamp, .alert-timestamp, .history-timestamp {
+    color: #666;
+    font-size: 0.7rem;
+    min-width: 60px;
+    text-align: right;
+}
+
+.result-type, .alert-type {
+    color: #00ff88;
+    font-weight: 600;
+    font-size: 0.7rem;
+    min-width: 60px;
+    text-transform: uppercase;
+}
+
+.alert-type {
+    color: #ffaa00;
+}
+
+.result-text, .alert-text {
+    color: #fff;
+    flex: 1;
+}
+
+.history-command {
+    color: #00ff88;
+    font-family: 'JetBrains Mono', monospace;
+    flex: 1;
+}
+
+.history-status {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.history-status.success {
+    background: #00ff88;
+    color: #000;
+}
+
+.history-status.error {
+    background: #ff4444;
+    color: #fff;
+}
+
+.clear-history-btn {
+    background: #333;
+    border: 1px solid #555;
+    color: #888;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.7rem;
+}
+
+.clear-history-btn:hover {
+    background: #ff4444;
+    color: #fff;
+    border-color: #ff4444;
 }
 
 .results-section, .alerts-section, .history-section {
@@ -1346,6 +1731,91 @@ body {
     font-weight: 600;
 }
 
+/* Fullscreen Terminal */
+.terminal-console.fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10000;
+    max-height: 100vh;
+    background: #0a0a0a;
+}
+
+.terminal-console.fullscreen .console-output {
+    height: calc(100vh - 60px);
+    overflow-y: auto;
+}
+
+/* Terminal Scrollbar */
+.terminal-console::-webkit-scrollbar,
+.terminal-results-list::-webkit-scrollbar,
+.terminal-alerts-list::-webkit-scrollbar,
+.terminal-history-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.terminal-console::-webkit-scrollbar-track,
+.terminal-results-list::-webkit-scrollbar-track,
+.terminal-alerts-list::-webkit-scrollbar-track,
+.terminal-history-list::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+.terminal-console::-webkit-scrollbar-thumb,
+.terminal-results-list::-webkit-scrollbar-thumb,
+.terminal-alerts-list::-webkit-scrollbar-thumb,
+.terminal-history-list::-webkit-scrollbar-thumb {
+    background: #00ff88;
+    border-radius: 3px;
+}
+
+.terminal-console::-webkit-scrollbar-thumb:hover,
+.terminal-results-list::-webkit-scrollbar-thumb:hover,
+.terminal-alerts-list::-webkit-scrollbar-thumb:hover,
+.terminal-history-list::-webkit-scrollbar-thumb:hover {
+    background: #00cc6a;
+}
+
+/* Enhanced Terminal Styling */
+.console-line {
+    transition: all 0.3s ease;
+}
+
+.console-line:hover {
+    background: rgba(0, 255, 136, 0.05);
+}
+
+.terminal-result-item:hover .result-type {
+    color: #00ff88;
+}
+
+.terminal-alert-item:hover .alert-type {
+    color: #ffaa00;
+}
+
+.terminal-history-item:hover .history-command {
+    color: #ffffff;
+}
+
+/* Anaconda-style prompt */
+.console-prompt[data-type="INFO"] {
+    color: #00ff88;
+}
+
+.console-prompt[data-type="SUCCESS"] {
+    color: #00ff88;
+}
+
+.console-prompt[data-type="WARNING"] {
+    color: #ffaa00;
+}
+
+.console-prompt[data-type="ERROR"] {
+    color: #ff4444;
+}
+
 /* Utility Classes */
 .hidden {
     display: none !important;
@@ -1367,4 +1837,36 @@ body {
 @keyframes slideIn {
     from { transform: translateX(100%); }
     to { transform: translateX(0); }
+}
+
+/* Terminal Animation */
+.console-cursor {
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+/* YOLO-style progress bars */
+.yolo-progress-bar {
+    position: relative;
+    overflow: hidden;
+}
+
+.yolo-progress-bar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    animation: progressShimmer 2s infinite;
+}
+
+@keyframes progressShimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
 }
