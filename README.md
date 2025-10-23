@@ -1,231 +1,239 @@
 # 🎯 AI Sniper Detection System Interface
 
-A modern, professional web interface for AI-powered sniper detection using YOLO11s model. This interface provides real-time detection capabilities with live camera feed, image/video upload support, and advanced visualization features.
+A modern, professional web interface for AI-powered sniper detection using YOLO11s model. Features an authentic Anaconda Prompt terminal-style UI with real-time detection capabilities.
+
+![AI Sniper Detection Interface](https://img.shields.io/badge/Status-Live-brightgreen)
+![YOLO11s](https://img.shields.io/badge/Model-YOLO11s-blue)
+![Terminal UI](https://img.shields.io/badge/UI-Anaconda%20Prompt%20Style-orange)
+
+## 🚀 Live Demo
+
+**[🌐 View Live Demo](https://your-username.github.io/ai-sniper-detection-interface/)**
 
 ## ✨ Features
 
-### 🎥 Live Detection
-- **Real-time camera feed** with continuous detection
-- **Live bounding box visualization** with confidence scores
-- **High-confidence alert system** for immediate threat notification
-- **Detection grid overlay** for enhanced targeting
+### 🖥️ **Anaconda Prompt Terminal Interface**
+- **Authentic terminal styling** with JetBrains Mono font
+- **Live console output** with color-coded messages
+- **Command history tracking** and logging
+- **Fullscreen terminal mode** for immersive experience
+- **Real-time status indicators** and alerts
 
-### 📁 Media Support
-- **Image upload** with drag & drop support
-- **Video upload** with detection overlay
-- **Multiple format support** (JPG, PNG, MP4, AVI)
-- **Instant preview** with detection results
+### 🎯 **AI Detection Capabilities**
+- **Live camera feed** detection with WebRTC
+- **Image upload** with instant processing
+- **Video upload** with frame-by-frame analysis
+- **Real-time bounding boxes** with confidence scores
+- **Sniper detection visualization** with pulsing effects
 
-### ⚙️ Advanced Controls
-- **Adjustable confidence threshold** (0.0 - 1.0)
-- **IOU threshold control** for detection accuracy
-- **Maximum detections limit** (1 - 1000)
-- **Real-time parameter adjustment**
+### 📊 **YOLO-Style Metrics Dashboard**
+- **Animated progress bars** with shimmer effects
+- **Real-time model performance** (mAP@50, mAP@50-95, Precision, Recall)
+- **Training metrics visualization** from results.csv
+- **Professional ML tool aesthetics**
 
-### 📊 Performance Monitoring
-- **Live model metrics** display (mAP@50, mAP@50-95, Precision, Recall)
-- **Processing time** tracking
-- **Detection history** with timestamps
-- **Export functionality** for results analysis
-
-### 🎨 Modern Interface
-- **YOLO-style design** inspired by Anaconda interfaces
-- **Dark theme** with professional color scheme
-- **Responsive layout** for all screen sizes
-- **Keyboard shortcuts** for power users
+### 🎨 **Modern UI/UX**
+- **Dark theme** with green terminal accents
+- **Responsive design** for all screen sizes
+- **Keyboard shortcuts** (Space for detection, Ctrl+E for export)
+- **Drag & drop** file upload
 - **Smooth animations** and transitions
 
-## 🚀 Quick Start
+## 🛠️ **Technology Stack**
 
-### Option 1: Direct Browser Access
-1. Open `index.html` in a modern web browser
-2. Allow camera permissions when prompted
-3. Click "START CAMERA" to begin live detection
-4. Or upload an image/video using the upload tab
+- **Frontend**: HTML5, CSS3, Vanilla JavaScript (ES6+)
+- **Styling**: Custom CSS with CSS Variables
+- **Fonts**: JetBrains Mono, Font Awesome Icons
+- **Camera**: WebRTC getUserMedia API
+- **Canvas**: HTML5 Canvas for detection visualization
+- **Backend**: Python HTTP Server (optional)
+
+## 📁 **Project Structure**
+
+```
+ai-sniper-detection-interface/
+├── index.html              # Main interface
+├── demo.html               # Demo/landing page
+├── styles.css              # Terminal-style CSS
+├── script.js               # Core functionality
+├── server.py               # Python backend server
+├── README.md               # This file
+├── results.csv             # Model performance metrics
+├── my_model.pt             # Trained YOLO11s model
+├── args.yaml               # Training configuration
+└── assets/                 # Images and visualizations
+    ├── *.png              # Training curves and metrics
+    ├── *.jpg              # Sample images
+    └── uploads/           # User uploads directory
+```
+
+## 🚀 **Quick Start**
+
+### Option 1: Direct File Access
+1. Download all files to a local directory
+2. Open `index.html` in a modern web browser
+3. Allow camera permissions when prompted
+4. Start detecting!
 
 ### Option 2: Local Server
-1. Start the Python server:
-   ```bash
-   python3 server.py
-   ```
-2. Open `http://localhost:8000` in your browser
-3. The interface will load with full functionality
+```bash
+# Clone the repository
+git clone https://github.com/your-username/ai-sniper-detection-interface.git
+cd ai-sniper-detection-interface
 
-### Option 3: Demo Mode
-1. Open `demo.html` for a guided introduction
-2. Click "Start Demo" to begin
-3. Explore all features with sample data
+# Start Python server
+python3 -m http.server 8000
 
-## 🎮 Controls
-
-### Keyboard Shortcuts
-- **SPACE** - Start/Stop detection
-- **Ctrl+O** - Open file dialog
-- **Ctrl+D** - Start detection
-- **Ctrl+C** - Clear results
-- **Ctrl+E** - Export results
-
-### Mouse Controls
-- **Click tabs** to switch input sources
-- **Drag sliders** to adjust parameters
-- **Click buttons** for actions
-- **Drag & drop** files for upload
-
-## 📈 Model Performance
-
-The interface displays real-time metrics from your trained model:
-
-- **mAP@50**: 68.69% - Mean Average Precision at 50% IoU
-- **mAP@50-95**: 57.32% - Mean Average Precision across IoU thresholds
-- **Precision**: 61.40% - True positive rate
-- **Recall**: 61.40% - Detection rate
-
-## 🔧 Configuration
-
-### Detection Settings
-- **Confidence Threshold**: Minimum confidence for detections (default: 0.5)
-- **IOU Threshold**: Intersection over Union threshold (default: 0.7)
-- **Max Detections**: Maximum number of detections per frame (default: 300)
-
-### Alert Settings
-- **High Confidence Alert**: Triggered when confidence > 0.8
-- **Visual Alerts**: Red bounding boxes with pulsing effect
-- **Audio Alerts**: Optional sound notifications
-
-## 📁 File Structure
-
-```
-/workspace/
-├── index.html          # Main interface
-├── demo.html           # Demo introduction
-├── styles.css          # Modern styling
-├── script.js           # Core functionality
-├── server.py           # Python backend
-├── my_model.pt         # Trained YOLO11s model
-├── results.csv         # Training metrics
-├── args.yaml           # Model configuration
-└── README.md           # This file
+# Open browser to http://localhost:8000
 ```
 
-## 🛠️ Technical Details
+### Option 3: GitHub Pages
+1. Fork this repository
+2. Enable GitHub Pages in repository settings
+3. Access via `https://your-username.github.io/ai-sniper-detection-interface/`
 
-### Frontend
-- **HTML5** with semantic structure
-- **CSS3** with modern features (Grid, Flexbox, Animations)
-- **Vanilla JavaScript** (ES6+) for performance
-- **Canvas API** for detection visualization
+## 🎮 **Usage Guide**
+
+### **Terminal Console**
+- **Console Tab**: View real-time system logs and commands
+- **Detection Tab**: Monitor detection results and alerts
+- **Metrics Tab**: View model performance metrics
+- **Clear Console**: Clear terminal output
+- **Export Logs**: Download system logs as text file
+- **Fullscreen**: Toggle fullscreen terminal mode
+
+### **Detection Controls**
+1. **Select Input Source**:
+   - Camera: Live webcam feed
+   - Image: Upload single image
+   - Video: Upload video file
+
+2. **Configure Detection**:
+   - Confidence Threshold: 0.0 - 1.0
+   - IoU Threshold: 0.0 - 1.0
+   - Max Detections: 1 - 100
+
+3. **Start Detection**:
+   - Click "START DETECTION" button
+   - Press SPACE key
+   - Detection results appear in real-time
+
+### **Keyboard Shortcuts**
+- `SPACE`: Start/stop detection
+- `Ctrl + E`: Export results
+- `Ctrl + S`: Take screenshot
+- `F11`: Toggle fullscreen terminal
+
+## 📊 **Model Performance**
+
+The interface displays real-time metrics from the trained YOLO11s model:
+
+| Metric | Value | Description |
+|--------|-------|-------------|
+| **mAP@50** | 68.69% | Mean Average Precision at IoU 0.5 |
+| **mAP@50-95** | 57.32% | Mean Average Precision at IoU 0.5-0.95 |
+| **Precision** | 61.40% | True Positives / (True Positives + False Positives) |
+| **Recall** | 61.40% | True Positives / (True Positives + False Negatives) |
+
+## 🎯 **Detection Features**
+
+### **Visual Indicators**
+- **Bounding Boxes**: Red rectangles around detected snipers
+- **Confidence Scores**: Percentage confidence for each detection
+- **Pulsing Effects**: High-confidence detections pulse
+- **Detection Grid**: Overlay grid for precise positioning
+- **Center Crosshair**: Targeting assistance
+
+### **Alert System**
+- **High Confidence Alerts**: Automatic alerts for >80% confidence
+- **Terminal Logging**: All detections logged with timestamps
+- **Export Capabilities**: Save detection results as JSON
+
+## 🔧 **Configuration**
+
+### **Detection Settings**
+```javascript
+// Adjustable parameters
+const config = {
+    confidenceThreshold: 0.5,    // Detection confidence
+    iouThreshold: 0.45,          // Intersection over Union
+    maxDetections: 10,           // Maximum detections per frame
+    detectionInterval: 1000      // Detection frequency (ms)
+};
+```
+
+### **Model Integration**
+The interface is designed to work with YOLO11s models. To integrate your own model:
+
+1. Replace `my_model.pt` with your trained model
+2. Update `results.csv` with your model's metrics
+3. Modify the detection API endpoint in `script.js`
+
+## 🌐 **Browser Support**
+
+- ✅ Chrome 80+
+- ✅ Firefox 75+
+- ✅ Safari 13+
+- ✅ Edge 80+
+
+**Required Features:**
+- WebRTC (for camera access)
+- Canvas API (for detection visualization)
+- ES6+ JavaScript support
+
+## 🔒 **Security & Privacy**
+
+- **Local Processing**: All detection runs client-side
+- **No Data Upload**: Images/videos stay on your device
+- **Camera Privacy**: Camera access only when explicitly requested
+- **Secure**: No external API calls or data transmission
+
+## 🚀 **Deployment Options**
+
+### **GitHub Pages** (Recommended)
+1. Fork this repository
+2. Go to Settings → Pages
+3. Select source branch (usually `main`)
+4. Access via `https://your-username.github.io/repo-name`
+
+### **Netlify**
+1. Connect your GitHub repository
+2. Deploy automatically on push
+3. Custom domain support available
+
+### **Vercel**
+1. Import GitHub repository
+2. Zero-config deployment
+3. Automatic HTTPS and CDN
+
+## 🤝 **Contributing**
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📝 **License**
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 **Acknowledgments**
+
+- **YOLO11s** model architecture
+- **Anaconda Prompt** for terminal UI inspiration
+- **JetBrains Mono** font family
+- **Font Awesome** for icons
 - **WebRTC** for camera access
 
-### Backend (Optional)
-- **Python 3** HTTP server
-- **JSON API** for model communication
-- **File upload** handling
-- **CORS** enabled for development
+## 📞 **Support**
 
-### Browser Support
-- **Chrome/Chromium** 80+
-- **Firefox** 75+
-- **Safari** 13+
-- **Edge** 80+
-
-## 🎯 Detection Visualization
-
-### Bounding Boxes
-- **Red boxes** around detected snipers
-- **Confidence scores** displayed as percentages
-- **Pulsing effect** for high-confidence detections
-- **Label backgrounds** for better visibility
-
-### Live Feed Overlay
-- **Detection grid** for targeting assistance
-- **Center crosshair** for precision
-- **Real-time updates** every second
-- **Smooth animations** for visual feedback
-
-## 📊 Export Features
-
-### Results Export
-- **JSON format** with full detection data
-- **Timestamp** and metadata included
-- **Settings** used for detection
-- **Confidence scores** and bounding boxes
-
-### Screenshot Support
-- **High-resolution** capture
-- **Detection overlay** included
-- **Multiple format** support
-
-## 🔒 Security Features
-
-- **Local processing** - no data sent to external servers
-- **Camera permissions** - user-controlled access
-- **File validation** - secure upload handling
-- **No tracking** - completely private operation
-
-## 🚀 Performance
-
-- **60 FPS** live detection capability
-- **Low latency** processing
-- **Memory efficient** canvas rendering
-- **Responsive** interface updates
-
-## 🎨 Customization
-
-### Color Scheme
-- **Primary**: #00ff88 (Green)
-- **Secondary**: #ff4444 (Red)
-- **Accent**: #0066ff (Blue)
-- **Background**: #0a0a0a (Dark)
-
-### Fonts
-- **Monospace**: JetBrains Mono
-- **Sans-serif**: Inter
-
-## 📱 Mobile Support
-
-- **Responsive design** for mobile devices
-- **Touch controls** for sliders and buttons
-- **Camera access** on mobile browsers
-- **Optimized layout** for small screens
-
-## 🐛 Troubleshooting
-
-### Camera Issues
-- Ensure camera permissions are granted
-- Try refreshing the page
-- Check browser compatibility
-- Verify camera is not in use by other applications
-
-### Detection Issues
-- Adjust confidence threshold
-- Check lighting conditions
-- Ensure clear view of target area
-- Try different input sources
-
-### Performance Issues
-- Close other browser tabs
-- Reduce max detections limit
-- Lower video resolution
-- Check system resources
-
-## 📞 Support
-
-For technical support or feature requests:
-- Check browser console for errors
-- Verify all files are present
-- Test with different browsers
-- Review system requirements
-
-## 🎉 Demo
-
-Try the live demo by opening `demo.html` in your browser. The demo includes:
-- Interactive feature showcase
-- Sample detection scenarios
-- Guided tour of the interface
-- Performance demonstrations
+- 🐛 **Bug Reports**: [Open an issue](https://github.com/your-username/ai-sniper-detection-interface/issues)
+- 💡 **Feature Requests**: [Start a discussion](https://github.com/your-username/ai-sniper-detection-interface/discussions)
+- 📧 **Contact**: [your-email@example.com](mailto:your-email@example.com)
 
 ---
 
-**Built with ❤️ for AI-powered security applications**
+**⭐ Star this repository if you found it helpful!**
 
-*This interface is designed to work with your trained YOLO11s model and provides a professional, user-friendly experience for sniper detection tasks.*
+![Terminal Interface Preview](https://via.placeholder.com/800x400/1a1a1a/00ff88?text=AI+Sniper+Detection+Terminal+Interface)
