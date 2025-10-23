@@ -6,6 +6,9 @@ class SniperDetectionSystem {
         this.isDetecting = false;
         this.cameraStream = null;
         this.model = null;
+        this.currentInputType = 'camera';
+        this.isCameraActive = false;
+        this.detectionInterval = null;
         
         this.initializeElements();
         this.attachEventListeners();
@@ -17,22 +20,41 @@ class SniperDetectionSystem {
         // Main elements
         this.fileInput = document.getElementById('fileInput');
         this.fileUploadArea = document.getElementById('fileUploadArea');
-        this.imageContainer = document.getElementById('imageContainer');
+        this.displayArea = document.getElementById('displayArea');
+        this.displayContainer = document.getElementById('displayContainer');
+        this.displayPlaceholder = document.getElementById('displayPlaceholder');
+        this.cameraFeed = document.getElementById('cameraFeed');
+        this.mediaDisplay = document.getElementById('mediaDisplay');
         this.displayImage = document.getElementById('displayImage');
+        this.displayVideo = document.getElementById('displayVideo');
+        this.liveVideo = document.getElementById('liveVideo');
+        this.liveCanvas = document.getElementById('liveCanvas');
         this.detectionCanvas = document.getElementById('detectionCanvas');
         this.detectionInfo = document.getElementById('detectionInfo');
-        this.detectionCount = document.querySelector('.detection-count');
-        this.processingTime = document.querySelector('.processing-time');
+        this.detectionCount = document.getElementById('detectionCount');
+        this.processingTime = document.getElementById('processingTime');
+        this.detectionList = document.getElementById('detectionList');
         
         // Control elements
-        this.inputBtns = document.querySelectorAll('.input-btn');
+        this.tabBtns = document.querySelectorAll('.tab-btn');
+        this.cameraControls = document.getElementById('cameraControls');
+        this.cameraPreview = document.getElementById('cameraPreview');
+        this.startCameraBtn = document.getElementById('startCamera');
+        this.stopCameraBtn = document.getElementById('stopCamera');
+        this.startCameraBtnPlaceholder = document.getElementById('startCameraBtn');
+        this.uploadMediaBtn = document.getElementById('uploadMediaBtn');
         this.detectBtn = document.getElementById('detectBtn');
         this.clearBtn = document.getElementById('clearBtn');
+        this.exportBtn = document.getElementById('exportBtn');
         this.confidenceSlider = document.getElementById('confidenceSlider');
         this.confidenceValue = document.getElementById('confidenceValue');
+        this.confidenceFill = document.getElementById('confidenceFill');
         this.iouSlider = document.getElementById('iouSlider');
         this.iouValue = document.getElementById('iouValue');
+        this.iouFill = document.getElementById('iouFill');
         this.maxDetections = document.getElementById('maxDetections');
+        this.maxDetMinus = document.getElementById('maxDetMinus');
+        this.maxDetPlus = document.getElementById('maxDetPlus');
         
         // Results elements
         this.resultsList = document.getElementById('resultsList');
@@ -49,6 +71,12 @@ class SniperDetectionSystem {
         // Alert elements
         this.alertNotification = document.getElementById('alertNotification');
         this.closeAlert = document.getElementById('closeAlert');
+        
+        // Display controls
+        this.zoomInBtn = document.getElementById('zoomInBtn');
+        this.zoomOutBtn = document.getElementById('zoomOutBtn');
+        this.fitScreenBtn = document.getElementById('fitScreenBtn');
+        this.screenshotBtn = document.getElementById('screenshotBtn');
     }
 
     attachEventListeners() {
@@ -59,22 +87,53 @@ class SniperDetectionSystem {
         this.fileUploadArea.addEventListener('drop', (e) => this.handleDrop(e));
         this.fileUploadArea.addEventListener('dragleave', (e) => this.handleDragLeave(e));
 
-        // Input type buttons
-        this.inputBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => this.switchInputType(e.target.dataset.type));
+        // Input type tabs
+        this.tabBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => this.switchInputType(e.currentTarget.dataset.type));
         });
+
+        // Camera controls
+        this.startCameraBtn.addEventListener('click', () => this.startCamera());
+        this.stopCameraBtn.addEventListener('click', () => this.stopCamera());
+        this.startCameraBtnPlaceholder.addEventListener('click', () => this.startCamera());
+        this.uploadMediaBtn.addEventListener('click', () => this.fileInput.click());
 
         // Detection controls
         this.detectBtn.addEventListener('click', () => this.startDetection());
         this.clearBtn.addEventListener('click', () => this.clearResults());
+        this.exportBtn.addEventListener('click', () => this.exportResults());
 
-        // Sliders
+        // Sliders with visual feedback
         this.confidenceSlider.addEventListener('input', (e) => {
-            this.confidenceValue.textContent = e.target.value;
+            const value = parseFloat(e.target.value);
+            this.confidenceValue.textContent = value.toFixed(2);
+            this.confidenceFill.style.width = `${value * 100}%`;
         });
         this.iouSlider.addEventListener('input', (e) => {
-            this.iouValue.textContent = e.target.value;
+            const value = parseFloat(e.target.value);
+            this.iouValue.textContent = value.toFixed(2);
+            this.iouFill.style.width = `${value * 100}%`;
         });
+
+        // Number input controls
+        this.maxDetMinus.addEventListener('click', () => {
+            const current = parseInt(this.maxDetections.value);
+            if (current > 1) {
+                this.maxDetections.value = current - 1;
+            }
+        });
+        this.maxDetPlus.addEventListener('click', () => {
+            const current = parseInt(this.maxDetections.value);
+            if (current < 1000) {
+                this.maxDetections.value = current + 1;
+            }
+        });
+
+        // Display controls
+        this.zoomInBtn.addEventListener('click', () => this.zoomIn());
+        this.zoomOutBtn.addEventListener('click', () => this.zoomOut());
+        this.fitScreenBtn.addEventListener('click', () => this.fitToScreen());
+        this.screenshotBtn.addEventListener('click', () => this.takeScreenshot());
 
         // Settings modal
         this.settingsBtn.addEventListener('click', () => this.openSettings());
@@ -120,49 +179,104 @@ class SniperDetectionSystem {
     initializeCamera() {
         // Initialize camera for live detection
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            this.setupCamera();
+            console.log('Camera support available');
         } else {
             console.log('Camera not supported');
+            this.showError('Camera not supported in this browser');
         }
     }
 
-    async setupCamera() {
+    async startCamera() {
         try {
             this.cameraStream = await navigator.mediaDevices.getUserMedia({
-                video: { width: 640, height: 480 }
+                video: { 
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 },
+                    facingMode: 'environment'
+                }
             });
             
-            const video = document.createElement('video');
-            video.srcObject = this.cameraStream;
-            video.play();
-            video.style.width = '100%';
-            video.style.height = '100%';
-            video.style.objectFit = 'cover';
+            this.liveVideo.srcObject = this.cameraStream;
+            this.liveVideo.play();
             
-            this.imageContainer.appendChild(video);
+            // Show camera feed
+            this.displayPlaceholder.style.display = 'none';
+            this.cameraFeed.style.display = 'block';
+            this.mediaDisplay.style.display = 'none';
+            
+            // Update controls
+            this.startCameraBtn.disabled = true;
+            this.stopCameraBtn.disabled = false;
+            this.isCameraActive = true;
+            
+            // Start continuous detection
+            this.startContinuousDetection();
+            
+            this.showNotification('Camera started successfully');
         } catch (error) {
-            console.log('Camera access denied:', error);
+            console.error('Camera access denied:', error);
+            this.showError('Camera access denied. Please allow camera permissions.');
         }
+    }
+
+    stopCamera() {
+        if (this.cameraStream) {
+            this.cameraStream.getTracks().forEach(track => track.stop());
+            this.cameraStream = null;
+        }
+        
+        // Stop continuous detection
+        if (this.detectionInterval) {
+            clearInterval(this.detectionInterval);
+            this.detectionInterval = null;
+        }
+        
+        // Hide camera feed
+        this.cameraFeed.style.display = 'none';
+        this.displayPlaceholder.style.display = 'flex';
+        
+        // Update controls
+        this.startCameraBtn.disabled = false;
+        this.stopCameraBtn.disabled = true;
+        this.isCameraActive = false;
+        
+        this.showNotification('Camera stopped');
+    }
+
+    startContinuousDetection() {
+        if (this.detectionInterval) {
+            clearInterval(this.detectionInterval);
+        }
+        
+        this.detectionInterval = setInterval(() => {
+            if (this.isCameraActive && !this.isDetecting) {
+                this.detectInLiveFeed();
+            }
+        }, 1000); // Detect every second
     }
 
     switchInputType(type) {
-        // Update active button
-        this.inputBtns.forEach(btn => btn.classList.remove('active'));
+        this.currentInputType = type;
+        
+        // Update active tab
+        this.tabBtns.forEach(btn => btn.classList.remove('active'));
         document.querySelector(`[data-type="${type}"]`).classList.add('active');
 
-        // Update file input accept attribute
+        // Show/hide appropriate controls
         switch (type) {
-            case 'upload':
-                this.fileInput.accept = 'image/*,video/*';
-                this.fileUploadArea.style.display = 'block';
-                break;
             case 'camera':
+                this.cameraControls.style.display = 'block';
                 this.fileUploadArea.style.display = 'none';
-                this.initializeCamera();
+                break;
+            case 'upload':
+                this.cameraControls.style.display = 'none';
+                this.fileUploadArea.style.display = 'block';
+                this.fileInput.accept = 'image/*';
                 break;
             case 'video':
-                this.fileInput.accept = 'video/*';
+                this.cameraControls.style.display = 'none';
                 this.fileUploadArea.style.display = 'block';
+                this.fileInput.accept = 'video/*';
                 break;
         }
     }
@@ -199,21 +313,30 @@ class SniperDetectionSystem {
             reader.onload = (e) => {
                 this.displayImage.src = e.target.result;
                 this.displayImage.style.display = 'block';
+                this.displayVideo.style.display = 'none';
                 this.currentImage = this.displayImage;
-                this.hidePlaceholder();
+                
+                // Show media display
+                this.displayPlaceholder.style.display = 'none';
+                this.cameraFeed.style.display = 'none';
+                this.mediaDisplay.style.display = 'block';
+                
+                this.showNotification('Image loaded successfully');
             };
             reader.readAsDataURL(file);
         } else if (file.type.startsWith('video/')) {
-            const video = document.createElement('video');
-            video.src = URL.createObjectURL(file);
-            video.controls = true;
-            video.style.width = '100%';
-            video.style.height = '100%';
-            video.style.objectFit = 'contain';
+            this.displayVideo.src = URL.createObjectURL(file);
+            this.displayVideo.controls = true;
+            this.displayVideo.style.display = 'block';
+            this.displayImage.style.display = 'none';
+            this.currentImage = this.displayVideo;
             
-            this.imageContainer.innerHTML = '';
-            this.imageContainer.appendChild(video);
-            this.hidePlaceholder();
+            // Show media display
+            this.displayPlaceholder.style.display = 'none';
+            this.cameraFeed.style.display = 'none';
+            this.mediaDisplay.style.display = 'block';
+            
+            this.showNotification('Video loaded successfully');
         }
     }
 
@@ -235,14 +358,19 @@ class SniperDetectionSystem {
         if (this.isDetecting) return;
 
         this.isDetecting = true;
-        this.detectBtn.innerHTML = '<div class="loading"></div> Processing...';
+        this.detectBtn.innerHTML = '<div class="loading"></div> PROCESSING...';
         this.detectBtn.disabled = true;
 
         const startTime = performance.now();
 
         try {
-            // Simulate AI detection (replace with actual model inference)
-            const results = await this.simulateDetection();
+            let results;
+            if (this.currentInputType === 'camera' && this.isCameraActive) {
+                results = await this.detectInLiveFeed();
+            } else {
+                results = await this.simulateDetection();
+            }
+            
             const endTime = performance.now();
             const processingTime = Math.round(endTime - startTime);
 
@@ -261,9 +389,82 @@ class SniperDetectionSystem {
             this.showError('Detection failed. Please try again.');
         } finally {
             this.isDetecting = false;
-            this.detectBtn.innerHTML = '<i class="fas fa-search"></i> Start Detection';
+            this.detectBtn.innerHTML = '<div class="btn-icon"><i class="fas fa-crosshairs"></i></div><div class="btn-text"><span class="btn-title">START DETECTION</span><span class="btn-subtitle">Press SPACE or Click</span></div>';
             this.detectBtn.disabled = false;
         }
+    }
+
+    async detectInLiveFeed() {
+        if (!this.liveVideo || !this.isCameraActive) return [];
+
+        // Capture current frame from live video
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = this.liveVideo.videoWidth;
+        canvas.height = this.liveVideo.videoHeight;
+        ctx.drawImage(this.liveVideo, 0, 0);
+
+        // Simulate detection on live feed
+        const results = await this.simulateDetection();
+        
+        // Draw detection results on live canvas
+        this.drawLiveDetections(results);
+        
+        return results;
+    }
+
+    drawLiveDetections(results) {
+        const canvas = this.liveCanvas;
+        const ctx = canvas.getContext('2d');
+        
+        // Set canvas size to match video
+        canvas.width = this.liveVideo.offsetWidth;
+        canvas.height = this.liveVideo.offsetHeight;
+        
+        // Clear previous drawings
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        results.forEach((result, index) => {
+            const [x, y, width, height] = result.bbox;
+            
+            // Draw bounding box
+            ctx.strokeStyle = '#ff4444';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(x, y, width, height);
+            
+            // Draw label background
+            const labelText = `SNIPER ${(result.confidence * 100).toFixed(1)}%`;
+            const labelWidth = ctx.measureText(labelText).width + 16;
+            const labelHeight = 25;
+            
+            ctx.fillStyle = '#ff4444';
+            ctx.fillRect(x, y - labelHeight, labelWidth, labelHeight);
+            
+            // Draw label text
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 14px JetBrains Mono, monospace';
+            ctx.fillText(labelText, x + 8, y - 8);
+            
+            // Draw confidence bar
+            const barWidth = width;
+            const barHeight = 6;
+            const confidenceWidth = (result.confidence * barWidth);
+            
+            ctx.fillStyle = 'rgba(255, 68, 68, 0.3)';
+            ctx.fillRect(x, y + height, barWidth, barHeight);
+            
+            ctx.fillStyle = '#ff4444';
+            ctx.fillRect(x, y + height, confidenceWidth, barHeight);
+            
+            // Draw pulsing effect for high confidence
+            if (result.confidence > 0.8) {
+                ctx.strokeStyle = '#ff4444';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]);
+                ctx.strokeRect(x - 5, y - 5, width + 10, height + 10);
+                ctx.setLineDash([]);
+            }
+        });
     }
 
     async simulateDetection() {
@@ -314,25 +515,25 @@ class SniperDetectionSystem {
             
             // Draw bounding box
             ctx.strokeStyle = '#ff4444';
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 3;
             ctx.strokeRect(x, y, width, height);
             
             // Draw label background
-            const labelText = `${result.class} (${(result.confidence * 100).toFixed(1)}%)`;
+            const labelText = `SNIPER ${(result.confidence * 100).toFixed(1)}%`;
             const labelWidth = ctx.measureText(labelText).width + 16;
-            const labelHeight = 20;
+            const labelHeight = 25;
             
             ctx.fillStyle = '#ff4444';
             ctx.fillRect(x, y - labelHeight, labelWidth, labelHeight);
             
             // Draw label text
             ctx.fillStyle = 'white';
-            ctx.font = '12px Inter, sans-serif';
-            ctx.fillText(labelText, x + 8, y - 6);
+            ctx.font = 'bold 14px JetBrains Mono, monospace';
+            ctx.fillText(labelText, x + 8, y - 8);
             
             // Draw confidence bar
             const barWidth = width;
-            const barHeight = 4;
+            const barHeight = 6;
             const confidenceWidth = (result.confidence * barWidth);
             
             ctx.fillStyle = 'rgba(255, 68, 68, 0.3)';
@@ -340,6 +541,15 @@ class SniperDetectionSystem {
             
             ctx.fillStyle = '#ff4444';
             ctx.fillRect(x, y + height, confidenceWidth, barHeight);
+            
+            // Draw pulsing effect for high confidence
+            if (result.confidence > 0.8) {
+                ctx.strokeStyle = '#ff4444';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]);
+                ctx.strokeRect(x - 5, y - 5, width + 10, height + 10);
+                ctx.setLineDash([]);
+            }
         });
     }
 
@@ -451,9 +661,114 @@ class SniperDetectionSystem {
         console.log(message);
     }
 
+    // Display control methods
+    zoomIn() {
+        // Implement zoom functionality
+        console.log('Zoom in');
+    }
+
+    zoomOut() {
+        // Implement zoom functionality
+        console.log('Zoom out');
+    }
+
+    fitToScreen() {
+        // Implement fit to screen functionality
+        console.log('Fit to screen');
+    }
+
+    takeScreenshot() {
+        // Implement screenshot functionality
+        console.log('Take screenshot');
+    }
+
+    exportResults() {
+        if (this.detectionResults.length === 0) {
+            this.showError('No results to export');
+            return;
+        }
+        
+        const data = {
+            timestamp: new Date().toISOString(),
+            detections: this.detectionResults,
+            settings: {
+                confidence: this.confidenceSlider.value,
+                iou: this.iouSlider.value,
+                maxDetections: this.maxDetections.value
+            }
+        };
+        
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `sniper_detection_${Date.now()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        
+        this.showNotification('Results exported successfully');
+    }
+
+    showNotification(message) {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = 'notification fade-in';
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
+            z-index: 1000;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            max-width: 300px;
+        `;
+        notification.textContent = message;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }
+
+    showError(message) {
+        // Create error notification
+        const notification = document.createElement('div');
+        notification.className = 'notification fade-in';
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #ff4444, #cc3333);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(255, 68, 68, 0.3);
+            z-index: 1000;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            max-width: 300px;
+        `;
+        notification.textContent = message;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.remove();
+        }, 5000);
+    }
+
     handleKeyboard(e) {
         // Keyboard shortcuts
-        if (e.ctrlKey || e.metaKey) {
+        if (e.code === 'Space') {
+            e.preventDefault();
+            this.startDetection();
+        } else if (e.ctrlKey || e.metaKey) {
             switch (e.key) {
                 case 'o':
                     e.preventDefault();
@@ -466,6 +781,10 @@ class SniperDetectionSystem {
                 case 'c':
                     e.preventDefault();
                     this.clearResults();
+                    break;
+                case 'e':
+                    e.preventDefault();
+                    this.exportResults();
                     break;
             }
         }

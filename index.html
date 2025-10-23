@@ -3,135 +3,302 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Sniper Detection System</title>
+    <title>AI Sniper Detection System - YOLO11s</title>
     <link rel="stylesheet" href="styles.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="app-container">
-        <!-- Header -->
-        <header class="header">
-            <div class="header-content">
-                <div class="logo">
-                    <i class="fas fa-crosshairs"></i>
-                    <h1>AI Sniper Detection System</h1>
+        <!-- Top Navigation Bar -->
+        <nav class="top-nav">
+            <div class="nav-left">
+                <div class="logo-section">
+                    <div class="logo-icon">
+                        <i class="fas fa-crosshairs"></i>
+                        <div class="pulse-ring"></div>
+                    </div>
+                    <div class="logo-text">
+                        <h1>SNIPER DETECTOR</h1>
+                        <span class="version">YOLO11s v1.0</span>
+                    </div>
                 </div>
-                <div class="header-controls">
+            </div>
+            <div class="nav-center">
+                <div class="model-status">
                     <div class="status-indicator">
                         <div class="status-dot active"></div>
-                        <span>System Active</span>
+                        <span>MODEL LOADED</span>
                     </div>
-                    <button class="settings-btn" id="settingsBtn">
+                    <div class="model-info">
+                        <span class="model-name">my_model.pt</span>
+                        <span class="model-size">640x640</span>
+                    </div>
+                </div>
+            </div>
+            <div class="nav-right">
+                <div class="nav-controls">
+                    <button class="nav-btn" id="fullscreenBtn" title="Fullscreen">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                    <button class="nav-btn" id="settingsBtn" title="Settings">
                         <i class="fas fa-cog"></i>
+                    </button>
+                    <button class="nav-btn" id="helpBtn" title="Help">
+                        <i class="fas fa-question-circle"></i>
                     </button>
                 </div>
             </div>
-        </header>
+        </nav>
 
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Left Panel - Controls -->
-            <div class="left-panel">
-                <div class="control-section">
-                    <h3><i class="fas fa-upload"></i> Input Source</h3>
-                    <div class="input-options">
-                        <button class="input-btn active" data-type="upload">
-                            <i class="fas fa-image"></i>
-                            Upload Image
-                        </button>
-                        <button class="input-btn" data-type="camera">
+            <!-- Left Control Panel -->
+            <div class="control-panel">
+                <!-- Input Source Section -->
+                <div class="panel-section">
+                    <div class="section-header">
+                        <i class="fas fa-video"></i>
+                        <h3>INPUT SOURCE</h3>
+                    </div>
+                    <div class="input-tabs">
+                        <button class="tab-btn active" data-type="camera">
                             <i class="fas fa-video"></i>
-                            Live Camera
+                            <span>LIVE CAMERA</span>
                         </button>
-                        <button class="input-btn" data-type="video">
+                        <button class="tab-btn" data-type="upload">
+                            <i class="fas fa-image"></i>
+                            <span>UPLOAD IMAGE</span>
+                        </button>
+                        <button class="tab-btn" data-type="video">
                             <i class="fas fa-file-video"></i>
-                            Upload Video
+                            <span>UPLOAD VIDEO</span>
                         </button>
                     </div>
                     
-                    <div class="file-upload-area" id="fileUploadArea">
-                        <div class="upload-content">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                            <p>Drag & drop image here or click to browse</p>
+                    <!-- Camera Controls -->
+                    <div class="camera-controls" id="cameraControls">
+                        <div class="camera-preview" id="cameraPreview">
+                            <video id="cameraVideo" autoplay muted></video>
+                            <div class="camera-overlay">
+                                <div class="detection-grid"></div>
+                                <div class="center-crosshair"></div>
+                            </div>
+                        </div>
+                        <div class="camera-buttons">
+                            <button class="control-btn" id="startCamera">
+                                <i class="fas fa-play"></i>
+                                START CAMERA
+                            </button>
+                            <button class="control-btn" id="stopCamera" disabled>
+                                <i class="fas fa-stop"></i>
+                                STOP CAMERA
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- File Upload Area -->
+                    <div class="file-upload-area" id="fileUploadArea" style="display: none;">
+                        <div class="upload-zone">
+                            <div class="upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <div class="upload-text">
+                                <h4>DRAG & DROP FILES HERE</h4>
+                                <p>Supports: JPG, PNG, MP4, AVI</p>
+                            </div>
                             <input type="file" id="fileInput" accept="image/*,video/*" multiple>
                         </div>
                     </div>
                 </div>
 
-                <div class="control-section">
-                    <h3><i class="fas fa-sliders-h"></i> Detection Settings</h3>
-                    <div class="setting-item">
-                        <label>Confidence Threshold</label>
-                        <div class="slider-container">
-                            <input type="range" id="confidenceSlider" min="0" max="1" step="0.01" value="0.5">
-                            <span id="confidenceValue">0.5</span>
-                        </div>
+                <!-- Detection Settings Section -->
+                <div class="panel-section">
+                    <div class="section-header">
+                        <i class="fas fa-sliders-h"></i>
+                        <h3>DETECTION SETTINGS</h3>
                     </div>
-                    <div class="setting-item">
-                        <label>IOU Threshold</label>
-                        <div class="slider-container">
-                            <input type="range" id="iouSlider" min="0" max="1" step="0.01" value="0.7">
-                            <span id="iouValue">0.7</span>
+                    <div class="settings-grid">
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <span>CONFIDENCE</span>
+                                <span class="value" id="confidenceValue">0.50</span>
+                            </div>
+                            <div class="slider-container">
+                                <input type="range" id="confidenceSlider" min="0" max="1" step="0.01" value="0.5">
+                                <div class="slider-track">
+                                    <div class="slider-fill" id="confidenceFill"></div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="setting-item">
-                        <label>Max Detections</label>
-                        <input type="number" id="maxDetections" value="300" min="1" max="1000">
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <span>IOU THRESHOLD</span>
+                                <span class="value" id="iouValue">0.70</span>
+                            </div>
+                            <div class="slider-container">
+                                <input type="range" id="iouSlider" min="0" max="1" step="0.01" value="0.7">
+                                <div class="slider-track">
+                                    <div class="slider-fill" id="iouFill"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <span>MAX DETECTIONS</span>
+                            </div>
+                            <div class="number-input">
+                                <button class="num-btn" id="maxDetMinus">-</button>
+                                <input type="number" id="maxDetections" value="300" min="1" max="1000">
+                                <button class="num-btn" id="maxDetPlus">+</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="control-section">
-                    <h3><i class="fas fa-chart-line"></i> Model Performance</h3>
-                    <div class="metrics-grid">
-                        <div class="metric-card">
-                            <div class="metric-value">68.69%</div>
-                            <div class="metric-label">mAP@50</div>
+                <!-- Model Performance Section -->
+                <div class="panel-section">
+                    <div class="section-header">
+                        <i class="fas fa-chart-line"></i>
+                        <h3>MODEL PERFORMANCE</h3>
+                    </div>
+                    <div class="metrics-container">
+                        <div class="metric-row">
+                            <div class="metric-item">
+                                <div class="metric-label">mAP@50</div>
+                                <div class="metric-value" id="map50Value">68.69%</div>
+                                <div class="metric-bar">
+                                    <div class="metric-fill" style="width: 68.69%"></div>
+                                </div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-label">mAP@50-95</div>
+                                <div class="metric-value" id="map50_95Value">57.32%</div>
+                                <div class="metric-bar">
+                                    <div class="metric-fill" style="width: 57.32%"></div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="metric-card">
-                            <div class="metric-value">57.32%</div>
-                            <div class="metric-label">mAP@50-95</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-value">61.40%</div>
-                            <div class="metric-label">Precision</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-value">61.40%</div>
-                            <div class="metric-label">Recall</div>
+                        <div class="metric-row">
+                            <div class="metric-item">
+                                <div class="metric-label">PRECISION</div>
+                                <div class="metric-value" id="precisionValue">61.40%</div>
+                                <div class="metric-bar">
+                                    <div class="metric-fill" style="width: 61.40%"></div>
+                                </div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-label">RECALL</div>
+                                <div class="metric-value" id="recallValue">61.40%</div>
+                                <div class="metric-bar">
+                                    <div class="metric-fill" style="width: 61.40%"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="control-section">
-                    <button class="detect-btn" id="detectBtn">
-                        <i class="fas fa-search"></i>
-                        Start Detection
-                    </button>
-                    <button class="clear-btn" id="clearBtn">
-                        <i class="fas fa-trash"></i>
-                        Clear Results
-                    </button>
+                <!-- Action Buttons Section -->
+                <div class="panel-section">
+                    <div class="action-buttons">
+                        <button class="primary-btn" id="detectBtn">
+                            <div class="btn-icon">
+                                <i class="fas fa-crosshairs"></i>
+                            </div>
+                            <div class="btn-text">
+                                <span class="btn-title">START DETECTION</span>
+                                <span class="btn-subtitle">Press SPACE or Click</span>
+                            </div>
+                        </button>
+                        <button class="secondary-btn" id="clearBtn">
+                            <i class="fas fa-trash"></i>
+                            <span>CLEAR RESULTS</span>
+                        </button>
+                        <button class="secondary-btn" id="exportBtn">
+                            <i class="fas fa-download"></i>
+                            <span>EXPORT RESULTS</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <!-- Center Panel - Main Display -->
-            <div class="center-panel">
-                <div class="display-container">
-                    <div class="image-container" id="imageContainer">
-                        <div class="placeholder">
-                            <i class="fas fa-image"></i>
-                            <p>Upload an image or start live detection</p>
+            <!-- Main Display Area -->
+            <div class="main-display">
+                <div class="display-header">
+                    <div class="display-title">
+                        <h2>DETECTION VIEW</h2>
+                        <div class="display-status" id="displayStatus">
+                            <div class="status-dot"></div>
+                            <span>READY</span>
                         </div>
-                        <canvas id="detectionCanvas"></canvas>
-                        <img id="displayImage" style="display: none;">
+                    </div>
+                    <div class="display-controls">
+                        <button class="display-btn" id="zoomInBtn" title="Zoom In">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                        <button class="display-btn" id="zoomOutBtn" title="Zoom Out">
+                            <i class="fas fa-search-minus"></i>
+                        </button>
+                        <button class="display-btn" id="fitScreenBtn" title="Fit to Screen">
+                            <i class="fas fa-expand-arrows-alt"></i>
+                        </button>
+                        <button class="display-btn" id="screenshotBtn" title="Take Screenshot">
+                            <i class="fas fa-camera"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="display-area" id="displayArea">
+                    <div class="display-container" id="displayContainer">
+                        <!-- Camera Feed -->
+                        <div class="camera-feed" id="cameraFeed" style="display: none;">
+                            <video id="liveVideo" autoplay muted></video>
+                            <canvas id="liveCanvas"></canvas>
+                        </div>
+                        
+                        <!-- Image/Video Display -->
+                        <div class="media-display" id="mediaDisplay" style="display: none;">
+                            <img id="displayImage" style="display: none;">
+                            <video id="displayVideo" controls style="display: none;"></video>
+                            <canvas id="detectionCanvas"></canvas>
+                        </div>
+                        
+                        <!-- Placeholder -->
+                        <div class="display-placeholder" id="displayPlaceholder">
+                            <div class="placeholder-content">
+                                <div class="placeholder-icon">
+                                    <i class="fas fa-crosshairs"></i>
+                                    <div class="pulse-ring"></div>
+                                </div>
+                                <h3>AI SNIPER DETECTION SYSTEM</h3>
+                                <p>Start camera or upload media to begin detection</p>
+                                <div class="placeholder-actions">
+                                    <button class="placeholder-btn" id="startCameraBtn">
+                                        <i class="fas fa-video"></i>
+                                        START CAMERA
+                                    </button>
+                                    <button class="placeholder-btn" id="uploadMediaBtn">
+                                        <i class="fas fa-upload"></i>
+                                        UPLOAD MEDIA
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div class="detection-info" id="detectionInfo" style="display: none;">
-                        <h4>Detection Results</h4>
-                        <div class="results-summary">
-                            <span class="detection-count">0 detections found</span>
-                            <span class="processing-time">Processing time: 0ms</span>
+                    <!-- Detection Overlay -->
+                    <div class="detection-overlay" id="detectionOverlay">
+                        <div class="detection-info" id="detectionInfo">
+                            <div class="info-header">
+                                <h4>DETECTION RESULTS</h4>
+                                <div class="info-stats">
+                                    <span class="detection-count" id="detectionCount">0 DETECTIONS</span>
+                                    <span class="processing-time" id="processingTime">0ms</span>
+                                </div>
+                            </div>
+                            <div class="detection-list" id="detectionList">
+                                <!-- Detection items will be added here -->
+                            </div>
                         </div>
                     </div>
                 </div>
